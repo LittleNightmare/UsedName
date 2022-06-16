@@ -7,6 +7,7 @@ using Dalamud;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Gui;
+using Dalamud.ContextMenu;
 using Dalamud.Interface.Internal.Notifications;
 using XivCommon;
 using System.Collections.Generic;
@@ -23,11 +24,14 @@ namespace UsedName
         private const string commandName = "/pusedname";
 
         private XivCommonBase Common { get; }
-        private ChatGui Chat { get;  set; }
+        public ChatGui Chat { get;  private set; }
+
+        public DalamudContextMenuBase ContextMenuBase { get; private set; }
+        public ContextMenu ContextMenu { get; private set; }
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
-        private Configuration Configuration { get; init; }
+        public Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
 
 
@@ -38,6 +42,7 @@ namespace UsedName
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
+            this.ContextMenuBase = new DalamudContextMenuBase();
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
@@ -45,26 +50,32 @@ namespace UsedName
             this.playersNameList = Configuration.playersNameList;
             this.Common = new XivCommonBase();
             this.Chat = chatGUI;
+            this.ContextMenu = new ContextMenu(this);
 
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
-            this.PluginUi = new PluginUI(this.Configuration, goatImage);
+            this.PluginUi = new PluginUI(this.Configuration);
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "使用'/pusedname'显示还没用的窗口\n使用'/pusedname update'更新好友列表\n使用'/pusedname search xxxx'填入当前名字搜索曾用名"
+                HelpMessage = "使用'/pusedname update'更新好友列表\n" +
+                "使用'/pusedname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n" +
+                "使用'/pusedname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友"
             });
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            // first time
+            if (Configuration.playersNameList.Count <= 0) {
+                this.UpdatePlayerNames();
+            }
+
+            // this.PluginInterface.UiBuilder.Draw += DrawUI;
+            // this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
         }
 
         public void Dispose()
         {
-            this.PluginUi.Dispose();
+            // this.PluginUi.Dispose();
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
         }
@@ -74,6 +85,9 @@ namespace UsedName
             if (args == "" || args == "config")
             {
                 this.PluginUi.Visible = !this.PluginUi.Visible;
+                Chat.Print("使用'/pusedname update'更新列表\n" +
+                    "使用'/pusedname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n"
+                    + "使用'/pusedname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友");
             }
             else if(args == "update")
             {
@@ -82,29 +96,24 @@ namespace UsedName
             else if (args.StartsWith("search"))
             {
                 var targetName = args.Split(" ")[1];
-                var result = this.searchPlayer(targetName);
-                Chat.Print($"目标[{targetName}]的搜索结果为: {result}");
+                this.searchPlayer(targetName);
             }
-        }
-
-        private string searchPlayer(string targetName)
-        {
-            string result = "";
-            foreach (var player in this.playersNameList)
+            else if (args.StartsWith("nick"))
             {
-                var current = player.Value.currentName;
-                if (current.ToLower().Contains(targetName.ToLower()))
+                string targetName= args.Split(" ")[1];
+                string nickName = "";
+                try
                 {
-                    result = $"{player.Key.ToString("X")}: [{string.Join(",", player.Value.usedNames)}]";
-                    break;
+                    nickName = args.Split(" ")[2];
                 }
+                catch (System.Exception)
+                {
+
+                }
+                this.addNickName(targetName, nickName);
             }
-            if (result == "")
-            {
-                result = "没有找到玩家";
-            }
-            return result;
         }
+        
 
         private void DrawUI()
         {
@@ -134,11 +143,62 @@ namespace UsedName
                 }
                 else
                 {
-                    this.playersNameList.Add(contentId, new Configuration.PlayersNames(name, new List<string> {}));
+                    this.playersNameList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> {}));
                     this.Configuration.Save();
                 }
 
             }
+        }
+
+        public string searchPlayer(string targetName, bool check=false)
+        {
+            string result = "";
+            foreach (var player in this.playersNameList)
+            {
+                var current = player.Value.currentName;
+                if (current.ToLower().Contains(targetName.ToLower()))
+                {
+                    var temp = string.IsNullOrEmpty(player.Value.nickName) ? player.Value.currentName : "player.Value.nickName";
+                    result += $"{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
+                }
+            }
+            Chat.Print($"目标[{targetName}]的搜索结果为:\n{result}");
+            return result;
+        }
+
+        private XivCommon.Functions.FriendList.FriendListEntry getPlayerByName(string name)
+        {
+            var friendList = Common.Functions.FriendList.List.GetEnumerator();
+            while (friendList.MoveNext())
+            {
+                var player = friendList.Current;
+                if (player.Name.ToString().ToLower().Contains(name))
+                {
+                    return player;
+                }
+            }
+            return new XivCommon.Functions.FriendList.FriendListEntry();
+        }
+
+        private void addNickName(string playerName, string nickName)
+        {
+            var player = getPlayerByName(playerName);
+            if (player.Equals(new XivCommon.Functions.FriendList.FriendListEntry()))
+            {
+                Chat.PrintError($"没有找到玩家{playerName}，请尝试使用'/pusedname update'更新好友列表");
+                return;
+            }
+            if (this.playersNameList.ContainsKey(player.ContentId))
+            {
+                this.playersNameList[player.ContentId].nickName = nickName;
+                this.Configuration.Save();
+            }
+            else
+            {
+                this.playersNameList.Add(player.ContentId, new Configuration.PlayersNames(player.Name.ToString(), nickName, new List<string> { }));
+                this.Configuration.Save();
+            }
+            Chat.Print($"{player.Name.ToString()}的昵称已经设置为{nickName}");
         }
     }
 }

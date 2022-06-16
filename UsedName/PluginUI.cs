@@ -10,8 +10,6 @@ namespace UsedName
     {
         private Configuration configuration;
 
-        private ImGuiScene.TextureWrap goatImage;
-
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
         public bool Visible
@@ -28,15 +26,14 @@ namespace UsedName
         }
 
         // passing in the image here just for simplicity
-        public PluginUI(Configuration configuration, ImGuiScene.TextureWrap goatImage)
+        public PluginUI(Configuration configuration)
         {
             this.configuration = configuration;
-            this.goatImage = goatImage;
         }
 
         public void Dispose()
         {
-            this.goatImage.Dispose();
+            
         }
 
         public void Draw()
@@ -74,7 +71,6 @@ namespace UsedName
 
                 ImGui.Text("Have a goat:");
                 ImGui.Indent(55);
-                ImGui.Image(this.goatImage.ImGuiHandle, new Vector2(this.goatImage.Width, this.goatImage.Height));
                 ImGui.Unindent(55);
             }
             ImGui.End();

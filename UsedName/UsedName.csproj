@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Authors>Littlenightmare</Authors>
     <Company></Company>
-    <Version>0.0.0.1</Version>
+    <Version>0.5.0.1</Version>
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/LittleNightamre/UsedName</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
@@ -20,22 +20,26 @@
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="..\Data\goat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
-
   <PropertyGroup>
     <DalamudLibPath>F:\ffxiv\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
     <PlatformTarget>x64</PlatformTarget>
     <DebugType>portable</DebugType>
+    <RepositoryUrl></RepositoryUrl>
+    <RepositoryType></RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="2.1.6" />
-    <PackageReference Include="XivCommon" Version="5.0.1-alpha.1" />
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.0.0" />
+    <PackageReference Include="DalamudPackager" Version="2.1.7" />
+    <PackageReference Include="XivCommon" Version="5.0.0" />
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
       <Private>false</Private>
