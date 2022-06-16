@@ -1,0 +1,11 @@
+{
+  "Author": "LittleNighmare",
+  "Name": "Used Name",
+  "Punchline": "*开发中* 一个简单记录玩家曾用名的工具，目前只支持好友列表",
+  "Description": "使用'/pusedname'显示还没用的窗口\n使用'/pusedname update'更新好友列表\n使用'/pusedname search xxxx'填入当前名字搜索曾用名",
+  "InternalName": "UsedName",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "social"
+  ]
+}
