@@ -59,10 +59,11 @@ namespace UsedName
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "使用'/pname update'更新好友列表\n" +
-                "使用'/pname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n" +
-                "使用'/pname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友"
-            });
+                HelpMessage = "Use '/pname' or '/pname update' to update data from FriendList\n" +
+                "Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n" +
+                "Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname', only support player from FriendList\n" +
+                "(Format require:first last nickname; first last nick name)"
+            }) ;
 
             // first time
             if (Configuration.playersNameList.Count <= 0)
@@ -85,14 +86,7 @@ namespace UsedName
 
         private void OnCommand(string command, string args)
         {
-            if (args == "" || args == "config")
-            {
-                this.PluginUi.Visible = !this.PluginUi.Visible;
-                Chat.Print("使用'/pname update'更新列表\n" +
-                    "使用'/pname search xxxx'搜索xxxx的曾用名\n"
-                    + "使用'/pname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友");
-            }
-            else if (args == "update")
+            if (args == "update"|| args == "")
             {
                 this.UpdatePlayerNames();
             }
@@ -110,7 +104,7 @@ namespace UsedName
                 }
                 else
                 {
-                    Chat.PrintError($"参数错误,长度为'{temp.Length}'");
+                    Chat.PrintError($"Parameter error, length is'{temp.Length}'");
                     return;
                 }
                 this.SearchPlayerResult(targetName);
@@ -125,7 +119,7 @@ namespace UsedName
             }
             else
             {
-                Chat.PrintError($"无效的参数{args}");
+                Chat.PrintError($"Invalid parameter: {args}");
             }
         }
 
@@ -163,15 +157,16 @@ namespace UsedName
 
             }
             this.Configuration.Save();
-            Chat.Print("更新好友列表完成");
+            Chat.Print("Update friends list completed");
         }
 
         public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName=false)
         {
             var result = new Dictionary<ulong, Configuration.PlayersNames>();
+            targetName = targetName.ToLower();
             foreach (var player in this.playersNameList)
             {
-                var current = player.Value.currentName;
+                var current = player.Value.currentName.ToLower();
                 var nickNmae = player.Value.nickName.ToLower();
                 if (current.Equals(targetName) || (useNickName && nickNmae.ToLower().Equals(targetName.ToLower())) || player.Value.usedNames.Any(name => name.Equals(targetName)))
                 {
@@ -189,7 +184,7 @@ namespace UsedName
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
                 result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
             }
-            Chat.Print($"目标[{targetName}]的搜索结果为:\n{result}");
+            Chat.Print($"Search result(s) for target [{targetName}]':\n{result}");
             return result;
         }
 
@@ -212,17 +207,17 @@ namespace UsedName
             var player = SearchPlayer(playerName);
             if (player.Count == 0)
             {
-                Chat.PrintError($"没有找到玩家{playerName}，请尝试使用'/pusedname update'更新好友列表，或检查拼写");
+                Chat.PrintError($"Cannot find player '{playerName}', Please try using '/pusedname update' to update the friends list, or check the spelling");
                 return;
             }
             if (player.Count > 1)
             {
-                Chat.PrintError($"找到多个玩家{playerName}，请使用准确的名字搜索玩家");
+                Chat.PrintError($"Find multiple '{playerName}', please search for players using the exact name");
                 return;
             }
             this.playersNameList[player.First().Key].nickName = nickName;
             this.Configuration.Save();
-            Chat.Print($"{playerName}的昵称已经设置为{nickName}");
+            Chat.Print($"The nickname of {playerName} has been set to {nickName}");
         }
         // name from command, try to solve "Palyer Name nick name", "Palyer Name nickname", not support "PalyerName nick name"
         public string[] ParseNameText(string text)

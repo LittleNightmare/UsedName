@@ -2,13 +2,21 @@
 
 一个针对FFXIV无备注名情况开发的插件。目前可以记录曾用名，添加昵称 *开发中*
 
+A plugin developed for the case of FFXIV without a note name. Currently it is possible to record former names and add nicknames *in development*.
+
 ## How to use
 
-使用'/pname update'更新好友列表
+使用'/pname update'或'/pname'更新好友列表
 
-使用'/pname search xxxx'搜索xxxx的曾用名
+使用'/pname search xxxx'搜索xxxx的曾用名。建议使用右键菜单搜索
 
 使用'/pname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友
+
+Use '/pname' or '/pname update' to update data from FriendList
+
+Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search
+
+Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname', only support player from FriendList (Format require:first last nickname; first last nick name)
 
 # TODO
 - [ ] GUI大致能游戏内浏览，添加/记录曾用名
