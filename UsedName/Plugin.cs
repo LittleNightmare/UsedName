@@ -24,7 +24,7 @@ namespace UsedName
         private const string commandName = "/pusedname";
 
         private XivCommonBase Common { get; }
-        public ChatGui Chat { get;  private set; }
+        public ChatGui Chat { get; private set; }
 
         public DalamudContextMenuBase ContextMenuBase { get; private set; }
         public ContextMenu ContextMenu { get; private set; }
@@ -64,7 +64,8 @@ namespace UsedName
             });
 
             // first time
-            if (Configuration.playersNameList.Count <= 0) {
+            if (Configuration.playersNameList.Count <= 0)
+            {
                 this.UpdatePlayerNames();
             }
 
@@ -89,31 +90,25 @@ namespace UsedName
                     "使用'/pusedname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n"
                     + "使用'/pusedname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友");
             }
-            else if(args == "update")
+            else if (args == "update")
             {
                 this.UpdatePlayerNames();
             }
             else if (args.StartsWith("search"))
             {
-                var targetName = args.Split(" ")[1];
-                this.searchPlayer(targetName);
+                var targetName = args.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries)[1];
+                this.SearchPlayer(targetName);
             }
             else if (args.StartsWith("nick"))
             {
-                string targetName= args.Split(" ")[1];
-                string nickName = "";
-                try
-                {
-                    nickName = args.Split(" ")[2];
-                }
-                catch (System.Exception)
-                {
-
-                }
-                this.addNickName(targetName, nickName);
+                //  "palyername nickname", "palyer name nick name", "palyer name nickname"
+                string[] parseName = ParseNameText(args.Substring(4));
+                string targetName = parseName[0];
+                string nickName = parseName[1];
+                this.AddNickName(targetName, nickName);
             }
         }
-        
+
 
         private void DrawUI()
         {
@@ -124,8 +119,9 @@ namespace UsedName
         {
             this.PluginUi.SettingsVisible = true;
         }
-        
-        private void UpdatePlayerNames () {
+
+        private void UpdatePlayerNames()
+        {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
             while (friendList.MoveNext())
             {
@@ -143,14 +139,14 @@ namespace UsedName
                 }
                 else
                 {
-                    this.playersNameList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> {}));
+                    this.playersNameList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
                     this.Configuration.Save();
                 }
 
             }
         }
 
-        public string searchPlayer(string targetName, bool check=false)
+        public string SearchPlayer(string targetName, bool check = false)
         {
             string result = "";
             foreach (var player in this.playersNameList)
@@ -166,7 +162,7 @@ namespace UsedName
             return result;
         }
 
-        private XivCommon.Functions.FriendList.FriendListEntry getPlayerByName(string name)
+        private XivCommon.Functions.FriendList.FriendListEntry GetPlayerByName(string name)
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
             while (friendList.MoveNext())
@@ -180,9 +176,9 @@ namespace UsedName
             return new XivCommon.Functions.FriendList.FriendListEntry();
         }
 
-        private void addNickName(string playerName, string nickName)
+        private void AddNickName(string playerName, string nickName)
         {
-            var player = getPlayerByName(playerName);
+            var player = GetPlayerByName(playerName);
             if (player.Equals(new XivCommon.Functions.FriendList.FriendListEntry()))
             {
                 Chat.PrintError($"没有找到玩家{playerName}，请尝试使用'/pusedname update'更新好友列表");
@@ -199,6 +195,32 @@ namespace UsedName
                 this.Configuration.Save();
             }
             Chat.Print($"{player.Name.ToString()}的昵称已经设置为{nickName}");
+        }
+        // name from command, try to solve "palyer name nick name", "palyer name nickname", not support "palyername nick name"
+        public string[] ParseNameText(string text)
+        {
+            var playerName = "";
+            var nickName = "";
+            var name = text.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+            if (name.Length == 4)
+            {
+                playerName = name[0] + " " + name[1];
+                nickName = name[2] + " " + name[3];
+            }
+            else if (name.Length == 3)
+            {
+                playerName = name[0] + " " + name[1];
+                nickName = name[2];
+            }
+            else if (name.Length == 2)
+            {
+                playerName = name[0];
+                nickName = name[1];
+            }
+
+            return new string[] { playerName, nickName };
+
         }
     }
 }

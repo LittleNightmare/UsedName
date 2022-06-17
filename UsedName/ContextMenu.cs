@@ -77,7 +77,7 @@ public class ContextMenu : IDisposable
         var target = args.Text.ToString();
         if (!string.IsNullOrEmpty(target))
         {
-            plugin.searchPlayer(args.Text.ToString());
+            plugin.SearchPlayer(args.Text.ToString());
         }
         else
         {
