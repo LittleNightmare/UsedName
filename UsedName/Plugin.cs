@@ -22,7 +22,7 @@ namespace UsedName
 
         public string Name => "Used Name";
 
-        private const string commandName = "/pusedname";
+        private const string commandName = "/pname";
 
         private XivCommonBase Common { get; }
         public ChatGui Chat { get; private set; }
@@ -59,9 +59,9 @@ namespace UsedName
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "使用'/pusedname update'更新好友列表\n" +
-                "使用'/pusedname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n" +
-                "使用'/pusedname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友"
+                HelpMessage = "使用'/pname update'更新好友列表\n" +
+                "使用'/pname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n" +
+                "使用'/pname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友"
             });
 
             // first time
@@ -88,9 +88,9 @@ namespace UsedName
             if (args == "" || args == "config")
             {
                 this.PluginUi.Visible = !this.PluginUi.Visible;
-                Chat.Print("使用'/pusedname update'更新列表\n" +
-                    "使用'/pusedname search xxxx'搜索xxxx的曾用名(不想支持昵称)\n"
-                    + "使用'/pusedname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友");
+                Chat.Print("使用'/pname update'更新列表\n" +
+                    "使用'/pname search xxxx'搜索xxxx的曾用名\n"
+                    + "使用'/pname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友");
             }
             else if (args == "update")
             {
