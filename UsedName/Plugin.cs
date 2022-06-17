@@ -11,6 +11,7 @@ using Dalamud.ContextMenu;
 using Dalamud.Interface.Internal.Notifications;
 using XivCommon;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UsedName
 {
@@ -79,6 +80,7 @@ namespace UsedName
             // this.PluginUi.Dispose();
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
+            this.ContextMenu.Dispose();
         }
 
         private void OnCommand(string command, string args)
@@ -107,6 +109,10 @@ namespace UsedName
                 string nickName = parseName[1];
                 this.AddNickName(targetName, nickName);
             }
+            else
+            {
+                Chat.PrintError($"无效的参数{args}");
+            }
         }
 
 
@@ -134,27 +140,29 @@ namespace UsedName
                     {
                         this.playersNameList[contentId].usedNames.Add(name);
                         this.playersNameList[contentId].currentName = name;
-                        this.Configuration.Save();
                     }
                 }
                 else
                 {
                     this.playersNameList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
-                    this.Configuration.Save();
                 }
 
             }
+            this.Configuration.Save();
+            Chat.Print("更新好友列表完成");
         }
 
-        public string SearchPlayer(string targetName, bool check = false)
+        public string SearchPlayer(string targetName)
         {
             string result = "";
+            string target = targetName.ToLower();
             foreach (var player in this.playersNameList)
             {
-                var current = player.Value.currentName;
-                if (current.ToLower().Contains(targetName.ToLower()))
+                var current = player.Value.currentName.ToLower();
+                var nickNmae = player.Value.nickName.ToLower();
+                if (current.Contains(target) || nickNmae.Contains(target) || player.Value.usedNames.Any(name => name.ToLower().Contains(target)))
                 {
-                    var temp = string.IsNullOrEmpty(player.Value.nickName) ? player.Value.currentName : "player.Value.nickName";
+                    var temp = string.IsNullOrEmpty(player.Value.nickName) ? player.Value.currentName : player.Value.nickName;
                     result += $"{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
                 }
             }
