@@ -98,12 +98,26 @@ namespace UsedName
             }
             else if (args.StartsWith("search"))
             {
-                var targetName = args.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries)[1];
-                this.SearchPlayer(targetName);
+                var temp = args.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+                var targetName = "";
+                if (temp.Length == 2)
+                {
+                    targetName = temp[1];
+                }
+                else if (temp.Length == 3)
+                {
+                    targetName = temp[1] + " " + temp[2];
+                }
+                else
+                {
+                    Chat.PrintError($"参数错误,长度为'{temp.Length}'");
+                    return;
+                }
+                this.SearchPlayerResult(targetName);
             }
             else if (args.StartsWith("nick"))
             {
-                //  "palyername nickname", "palyer name nick name", "palyer name nickname"
+                //  "PalyerName nickname", "Palyer Name nick name", "Palyer Name nickname"
                 string[] parseName = ParseNameText(args.Substring(4));
                 string targetName = parseName[0];
                 string nickName = parseName[1];
@@ -152,31 +166,40 @@ namespace UsedName
             Chat.Print("更新好友列表完成");
         }
 
-        public string SearchPlayer(string targetName)
+        public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName=false)
         {
-            string result = "";
-            string target = targetName.ToLower();
+            var result = new Dictionary<ulong, Configuration.PlayersNames>();
             foreach (var player in this.playersNameList)
             {
-                var current = player.Value.currentName.ToLower();
+                var current = player.Value.currentName;
                 var nickNmae = player.Value.nickName.ToLower();
-                if (current.Contains(target) || nickNmae.Contains(target) || player.Value.usedNames.Any(name => name.ToLower().Contains(target)))
+                if (current.Equals(targetName) || (useNickName && nickNmae.ToLower().Equals(targetName.ToLower())) || player.Value.usedNames.Any(name => name.Equals(targetName)))
                 {
-                    var temp = string.IsNullOrEmpty(player.Value.nickName) ? player.Value.currentName : player.Value.nickName;
-                    result += $"{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
+                    result.Add(player.Key, player.Value);
                 }
+            }
+            return result;
+        }
+
+        public string SearchPlayerResult(string targetName)
+        {
+            string result = "";
+            foreach (var player in SearchPlayer(targetName, true))
+            {
+                var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
+                result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
             }
             Chat.Print($"目标[{targetName}]的搜索结果为:\n{result}");
             return result;
         }
 
-        private XivCommon.Functions.FriendList.FriendListEntry GetPlayerByName(string name)
+        private XivCommon.Functions.FriendList.FriendListEntry GetPlayerByNameFromFriendList(string name)
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
             while (friendList.MoveNext())
             {
                 var player = friendList.Current;
-                if (player.Name.ToString().ToLower().Contains(name))
+                if (player.Name.ToString().Equals(name))
                 {
                     return player;
                 }
@@ -186,25 +209,22 @@ namespace UsedName
 
         private void AddNickName(string playerName, string nickName)
         {
-            var player = GetPlayerByName(playerName);
-            if (player.Equals(new XivCommon.Functions.FriendList.FriendListEntry()))
+            var player = SearchPlayer(playerName);
+            if (player.Count == 0)
             {
-                Chat.PrintError($"没有找到玩家{playerName}，请尝试使用'/pusedname update'更新好友列表");
+                Chat.PrintError($"没有找到玩家{playerName}，请尝试使用'/pusedname update'更新好友列表，或检查拼写");
                 return;
             }
-            if (this.playersNameList.ContainsKey(player.ContentId))
+            if (player.Count > 1)
             {
-                this.playersNameList[player.ContentId].nickName = nickName;
-                this.Configuration.Save();
+                Chat.PrintError($"找到多个玩家{playerName}，请使用准确的名字搜索玩家");
+                return;
             }
-            else
-            {
-                this.playersNameList.Add(player.ContentId, new Configuration.PlayersNames(player.Name.ToString(), nickName, new List<string> { }));
-                this.Configuration.Save();
-            }
-            Chat.Print($"{player.Name.ToString()}的昵称已经设置为{nickName}");
+            this.playersNameList[player.First().Key].nickName = nickName;
+            this.Configuration.Save();
+            Chat.Print($"{playerName}的昵称已经设置为{nickName}");
         }
-        // name from command, try to solve "palyer name nick name", "palyer name nickname", not support "palyername nick name"
+        // name from command, try to solve "Palyer Name nick name", "Palyer Name nickname", not support "PalyerName nick name"
         public string[] ParseNameText(string text)
         {
             var playerName = "";
