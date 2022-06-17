@@ -39,19 +39,19 @@ public class ContextMenu : IDisposable
     {
         switch (args.ParentAddonName)
         {
-            //case null: // Nameplate/Model menu
-            //case "LookingForGroup":
-            //case "PartyMemberList":
+            case null: // Nameplate/Model menu
+            case "LookingForGroup":
+            case "PartyMemberList":
             case "FriendList":
-            //case "FreeCompany":
-            //case "SocialList":
-            //case "ContactList":
-            //case "ChatLog":
-            //case "_PartyList":
-            //case "LinkShell":
-            //case "CrossWorldLinkshell":
-            //case "ContentMemberList": // Eureka/Bozja/...
-            //case "BeginnerChatList":
+            case "FreeCompany":
+            case "SocialList":
+            case "ContactList":
+            case "ChatLog":
+            case "_PartyList":
+            case "LinkShell":
+            case "CrossWorldLinkshell":
+            case "ContentMemberList": // Eureka/Bozja/...
+            case "BeginnerChatList":
                 return args.Text != null && args.ObjectWorld != 0 && args.ObjectWorld != 65535;
 
             default:
