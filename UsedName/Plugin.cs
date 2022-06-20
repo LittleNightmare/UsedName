@@ -183,7 +183,7 @@ namespace UsedName
             {
                 var current = player.Value.currentName.ToLower();
                 var nickNmae = player.Value.nickName.ToLower();
-                if (current.Equals(targetName) || (useNickName && nickNmae.ToLower().Equals(targetName.ToLower())) || player.Value.usedNames.Any(name => name.Equals(targetName)))
+                if (current.Equals(targetName) || (useNickName && nickNmae.ToLower().Equals(targetName)) || player.Value.usedNames.Any(name => name.Equals(targetName)))
                 {
                     result.Add(player.Key, player.Value);
                 }
@@ -255,6 +255,10 @@ namespace UsedName
             {
                 playerName = name[0];
                 nickName = name[1];
+            }
+            else if (name.Length == 1)
+            {
+                playerName = name[0];
             }
 
             return new string[] { playerName, nickName };
