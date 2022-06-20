@@ -18,8 +18,6 @@ namespace UsedName
     public sealed class UsedName : IDalamudPlugin
     {
 
-        private IDictionary<ulong, Configuration.PlayersNames> playersNameList;
-
         public string Name => "Used Name";
 
         private const string commandName = "/pname";
@@ -50,7 +48,6 @@ namespace UsedName
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
 
-            this.playersNameList = Configuration.playersNameList;
             this.Common = new XivCommonBase();
             this.Chat = chatGUI;
             this.ContextMenu = new ContextMenu(this);
@@ -69,7 +66,7 @@ namespace UsedName
             }) ;
 
             // first time
-            if (Configuration.playersNameList.Count <= 0)
+            if (this.Configuration.playersNameList.Count <= 0)
             {
                 this.UpdatePlayerNames();
             }
@@ -148,30 +145,32 @@ namespace UsedName
         internal void UpdatePlayerNames()
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
+            var savedFriednList = this.Configuration.playersNameList;
             while (friendList.MoveNext())
             {
                 var player = friendList.Current;
                 var contentId = player.ContentId;
                 var name = player.Name.ToString();
-                if (this.playersNameList.ContainsKey(contentId))
+                if (savedFriednList.ContainsKey(contentId))
                 {
-                    if (!this.playersNameList[contentId].currentName.Equals(name))
+                    if (!this.Configuration.playersNameList[contentId].currentName.Equals(name))
                     {
-                        this.playersNameList[contentId].usedNames.Add(name);
-                        this.playersNameList[contentId].currentName = name;
+                        savedFriednList[contentId].usedNames.Add(name);
+                        savedFriednList[contentId].currentName = name;
                         if (Configuration.ShowNameChange)
                         {
-                            var temp = string.IsNullOrEmpty(this.playersNameList[contentId].nickName) ? name : $"({this.playersNameList[contentId].nickName})";
-                            Chat.Print($"{temp} changed name to {this.playersNameList[contentId].currentName}\n");
+                            var temp = string.IsNullOrEmpty(savedFriednList[contentId].nickName) ? name : $"({savedFriednList[contentId].nickName})";
+                            Chat.Print($"{temp} changed name to {savedFriednList[contentId].currentName}\n");
                         }
                     }
                 }
                 else
                 {
-                    this.playersNameList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
+                    savedFriednList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
                 }
 
             }
+            this.Configuration.playersNameList = savedFriednList;
             this.Configuration.Save();
             Chat.Print("Update FriendList completed");
         }
@@ -180,7 +179,7 @@ namespace UsedName
         {
             var result = new Dictionary<ulong, Configuration.PlayersNames>();
             targetName = targetName.ToLower();
-            foreach (var player in this.playersNameList)
+            foreach (var player in this.Configuration.playersNameList)
             {
                 var current = player.Value.currentName.ToLower();
                 var nickNmae = player.Value.nickName.ToLower();
@@ -231,7 +230,7 @@ namespace UsedName
                 Chat.PrintError($"Find multiple '{playerName}', please search for players using the exact name");
                 return;
             }
-            this.playersNameList[player.First().Key].nickName = nickName;
+            this.Configuration.playersNameList[player.First().Key].nickName = nickName;
             this.Configuration.Save();
             Chat.Print($"The nickname of {playerName} has been set to {nickName}");
         }
