@@ -74,6 +74,10 @@ public class ContextMenu : IDisposable
 
     private void AddNickName(GameObjectContextMenuItemSelectedArgs args)
     {
+        if (!IsMenuValid(args))
+        {
+            return;
+        }
         plugin.tempPlayerName = args.Text.ToString();
         plugin.DrawMainUI();
     }
