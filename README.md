@@ -12,15 +12,19 @@ A plugin developed for the case of FFXIV without a note name. Currently it is po
 
 使用'/pname nick xxxx aaaa'设置xxxx的昵称为aaaa，仅支持好友
 
+使用'/pname config'显示插件设置
+
 Use '/pname' or '/pname update' to update data from FriendList
 
 Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search
 
 Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname', only support player from FriendList (Format require:first last nickname; first last nick name)
 
+Use '/pname config' show plugin's setting
+
 # TODO
 - [ ] GUI大致能游戏内浏览，添加/记录曾用名
 - [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友
 
 # Thanks
-感谢FFLogsViewer各个分支的参考，还有@zhouhuichen741从远路把我拽回来。
+感谢FFLogsViewer各个分支的参考，还有zhouhuichen741从远路把我拽回来。
