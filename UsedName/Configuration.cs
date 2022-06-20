@@ -11,6 +11,8 @@ namespace UsedName
     {
         public int Version { get; set; } = 1;
 
+        public string Language = "en"; 
+
         public bool ShowNameChange = true;
         
         public bool EnableSearchInContext = false;
@@ -41,7 +43,7 @@ namespace UsedName
 
         [NonSerialized]
         private DalamudPluginInterface? pluginInterface;
-        
+
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             this.pluginInterface = pluginInterface;

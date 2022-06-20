@@ -34,6 +34,7 @@ namespace UsedName
         private PluginUI PluginUi { get; init; }
         // interrupt between UI and ContextMenu
         internal string tempPlayerName { get; set;  } = "";
+        internal Localization loc { get; set; }
 
 
         public UsedName(
@@ -52,6 +53,8 @@ namespace UsedName
             this.Chat = chatGUI;
             this.ContextMenu = new ContextMenu(this);
 
+            //this.loc = new Localization(this.Configuration.Language);
+            this.loc = new Localization(this.Configuration.Language);
 
             // you might normally want to embed resources and load them from the manifest stream
             this.PluginUi = new PluginUI(this);
@@ -82,6 +85,9 @@ namespace UsedName
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
             this.ContextMenu.Dispose();
+#if DEBUG
+            this.loc.StoreLanguage();
+#endif
         }
 
         private void OnCommand(string command, string args)
@@ -104,7 +110,7 @@ namespace UsedName
                 }
                 else
                 {
-                    Chat.PrintError($"Parameter error, length is'{temp.Length}'");
+                    Chat.PrintError(string.Format(this.loc.Localize("Parameter error, length is '{0}'"),temp.Length));
                     return;
                 }
                 this.SearchPlayerResult(targetName);
@@ -122,8 +128,8 @@ namespace UsedName
                 this.DrawConfigUI();
             }
             else
-            {
-                Chat.PrintError($"Invalid parameter: {args}");
+            {               
+                Chat.PrintError(this.loc.Localize($"Invalid parameter: ")+args);
             }
         }
 
@@ -160,7 +166,7 @@ namespace UsedName
                         if (Configuration.ShowNameChange)
                         {
                             var temp = string.IsNullOrEmpty(savedFriednList[contentId].nickName) ? name : $"({savedFriednList[contentId].nickName})";
-                            Chat.Print($"{temp} changed name to {savedFriednList[contentId].currentName}\n");
+                            Chat.Print(temp + this.loc.Localize($" changed name to ") + $"{savedFriednList[contentId].currentName}\n");
                         }
                     }
                 }
@@ -172,7 +178,7 @@ namespace UsedName
             }
             this.Configuration.playersNameList = savedFriednList;
             this.Configuration.Save();
-            Chat.Print("Update FriendList completed");
+            Chat.Print(this.loc.Localize("Update FriendList completed"));
         }
 
         public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName=false)
@@ -199,7 +205,7 @@ namespace UsedName
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
                 result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
             }
-            Chat.Print($"Search result(s) for target [{targetName}]:\n{result}");
+            Chat.Print(this.loc.Localize($"Search result(s) for target ")+$"[{targetName}]:\n{result}");
             return result;
         }
         
@@ -222,17 +228,17 @@ namespace UsedName
             var player = SearchPlayer(playerName);
             if (player.Count == 0)
             {
-                Chat.PrintError($"Cannot find player '{playerName}', Please try using '/pusedname update' to update FriendList, or check the spelling");
+                Chat.PrintError(string.Format(this.loc.Localize("Cannot find player '{0}', Please try using '/pusedname update' to update FriendList, or check the spelling"), playerName));
                 return;
             }
             if (player.Count > 1)
             {
-                Chat.PrintError($"Find multiple '{playerName}', please search for players using the exact name");
+                Chat.PrintError(string.Format(this.loc.Localize("Find multiple '{0}', please search for players using the exact name"), playerName));
                 return;
             }
             this.Configuration.playersNameList[player.First().Key].nickName = nickName;
             this.Configuration.Save();
-            Chat.Print($"The nickname of {playerName} has been set to {nickName}");
+            Chat.Print(string.Format(this.loc.Localize("The nickname of {0} has been set to {1}"), playerName, nickName));
         }
         // name from command, try to solve "Palyer Name nick name", "Palyer Name nickname", not support "PalyerName nick name"
         public string[] ParseNameText(string text)

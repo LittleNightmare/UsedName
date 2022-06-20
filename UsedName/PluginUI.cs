@@ -60,15 +60,15 @@ namespace UsedName
 
             ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin("Used Name: Add nick name", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.Begin(this.plugin.loc.Localize("Used Name: Add nick name"), ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text($"{this.plugin.tempPlayerName}'s current nick name:");
+                ImGui.Text(this.plugin.tempPlayerName + this.plugin.loc.Localize("'s current nick name:"));
                 var target = this.plugin.GetPlayerByNameFromFriendList(this.plugin.tempPlayerName);
                 if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry())||! this.configuration.playersNameList.TryGetValue(target.ContentId, out _))
                 {
-                    ImGui.Text($"NO PLAYER FOUND. Please makesure {this.plugin.tempPlayerName} is your friend.\nThen, try update FriendList");
+                    ImGui.Text(String.Format(this.plugin.loc.Localize("NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList"), this.plugin.tempPlayerName));
                     ImGui.Spacing();
-                    if (ImGui.Button("Update FriendList"))
+                    if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
                     {
                         this.plugin.UpdatePlayerNames();
                     }
@@ -98,21 +98,21 @@ namespace UsedName
             ImGui.SetNextWindowSize(new Vector2(300, 350), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Used Name Settings", ref this.settingsVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                if (ImGui.Button("Update FriendList"))
+                if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
                 {
                     this.plugin.UpdatePlayerNames();
                 }
 
-                if (ImGui.Checkbox("Name Change Check", ref this.configuration.ShowNameChange))
+                if (ImGui.Checkbox(this.plugin.loc.Localize("Name Change Check"), ref this.configuration.ShowNameChange))
                 {
                     // can save immediately on change, if you don't want to provide a "Save and Close" button
                     this.configuration.Save();
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip("Show palyer who changed name when update FriendList");
+                    ImGui.SetTooltip(this.plugin.loc.Localize("Show palyer who changed name when update FriendList"));
                 }
-                if (ImGui.Checkbox("Enable Search In Context", ref this.configuration.EnableSearchInContext))
+                if (ImGui.Checkbox(this.plugin.loc.Localize("Enable Search In Context"), ref this.configuration.EnableSearchInContext))
                 {
                     this.configuration.Save();
                 }
@@ -121,7 +121,7 @@ namespace UsedName
                 {
                     ImGui.Spacing();
                     ImGui.Indent();
-                    ImGui.TextUnformatted("Search in Context String");
+                    ImGui.TextUnformatted(this.plugin.loc.Localize("Search in Context String"));
                     ImGui.SameLine();
                     if (ImGui.InputText("##SearchInContextString", ref this.configuration.SearchString, 15))
                     {
@@ -130,7 +130,7 @@ namespace UsedName
                     ImGui.Unindent();
 
                 }
-                if (ImGui.Checkbox("Enable Add Nick Name", ref this.configuration.EnableAddNickName))
+                if (ImGui.Checkbox(this.plugin.loc.Localize("Enable Add Nick Name"), ref this.configuration.EnableAddNickName))
                 {
                     this.configuration.Save();
                 }
@@ -138,7 +138,7 @@ namespace UsedName
                 {
                     ImGui.Spacing();
                     ImGui.Indent();
-                    ImGui.TextUnformatted("Add Nick Name String");
+                    ImGui.TextUnformatted(this.plugin.loc.Localize("Add Nick Name String"));
                     ImGui.SameLine();
                     if (ImGui.InputText("##AddNickNameString", ref this.configuration.AddNickNameString, 15))
                     {
