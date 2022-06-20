@@ -1,4 +1,5 @@
 ﻿using Dalamud.Configuration;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,13 @@ namespace UsedName
     {
         public int Version { get; set; } = 1;
 
-        public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
+        public bool ShowNameChange = true;
+        
+        public bool EnableSearchInContext = false;
+        public string SearchString = "Search Used Name";
+        
+        public bool EnableAddNickName = true;
+        public string AddNickNameString  = "Add Nick Name";
 
         public class PlayersNames
         {
@@ -29,13 +36,12 @@ namespace UsedName
 
         public IDictionary<ulong, PlayersNames> playersNameList = new Dictionary<ulong, PlayersNames>();
 
-        public bool ContextMenu = true;
 
         // the below exist just to make saving less cumbersome
 
         [NonSerialized]
         private DalamudPluginInterface? pluginInterface;
-
+        
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             this.pluginInterface = pluginInterface;

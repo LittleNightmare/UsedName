@@ -9,6 +9,7 @@ namespace UsedName
     class PluginUI : IDisposable
     {
         private Configuration configuration;
+        private readonly UsedName plugin;
 
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
@@ -26,11 +27,12 @@ namespace UsedName
         }
 
         // passing in the image here just for simplicity
-        public PluginUI(Configuration configuration)
+        public PluginUI(UsedName Plugin)
         {
-            this.configuration = configuration;
+            this.plugin = Plugin;
+            this.configuration = plugin.Configuration;
         }
-
+        
         public void Dispose()
         {
             
@@ -58,20 +60,30 @@ namespace UsedName
 
             ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin("My Amazing Window", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.Begin("Used Name: Add nick name", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text($"The random config bool is {this.configuration.SomePropertyToBeSavedAndWithADefault}");
-
-                if (ImGui.Button("Show Settings"))
+                ImGui.Text($"{this.plugin.tempPlayerName}'s current nick name:");
+                var target = this.plugin.GetPlayerByNameFromFriendList(this.plugin.tempPlayerName);
+                if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry()))
                 {
-                    SettingsVisible = true;
+                    ImGui.Text($"NO PLAYER FOUND. Please makesure {this.plugin.tempPlayerName} is your friend.\nThen, try update FriendList");
+                    ImGui.Spacing();
+                    if (ImGui.Button("Update FriendList"))
+                    {
+                        this.plugin.UpdatePlayerNames();
+                    }
+                }
+                else
+                {
+                    var nickName = this.configuration.playersNameList[target.ContentId].nickName;
+                    // var nickName = target.nickName;
+                    if (ImGui.InputText("##CurrentNickName", ref nickName, 15))
+                    {
+                        this.configuration.playersNameList[target.ContentId].nickName = nickName;
+                        this.configuration.Save();
+                    }
                 }
 
-                ImGui.Spacing();
-
-                ImGui.Text("Have a goat:");
-                ImGui.Indent(55);
-                ImGui.Unindent(55);
             }
             ImGui.End();
         }
@@ -83,20 +95,60 @@ namespace UsedName
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(232, 75), ImGuiCond.Always);
-            if (ImGui.Begin("A Wonderful Configuration Window", ref this.settingsVisible,
-                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            ImGui.SetNextWindowSize(new Vector2(300, 350), ImGuiCond.FirstUseEver);
+            if (ImGui.Begin("Used Name Settings", ref this.settingsVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                // can't ref a property, so use a local copy
-                var configValue = this.configuration.SomePropertyToBeSavedAndWithADefault;
-                if (ImGui.Checkbox("Random Config Bool", ref configValue))
+                if (ImGui.Button("Update FriendList"))
                 {
-                    this.configuration.SomePropertyToBeSavedAndWithADefault = configValue;
+                    this.plugin.UpdatePlayerNames();
+                }
+
+                if (ImGui.Checkbox("Name Change Check", ref this.configuration.ShowNameChange))
+                {
                     // can save immediately on change, if you don't want to provide a "Save and Close" button
                     this.configuration.Save();
                 }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip("Show palyer who changed name when update FriendList");
+                }
+                if (ImGui.Checkbox("Enable Search In Context", ref this.configuration.EnableSearchInContext))
+                {
+                    this.configuration.Save();
+                }
+
+                if (this.configuration.EnableSearchInContext)
+                {
+                    ImGui.Spacing();
+                    ImGui.Indent();
+                    ImGui.TextUnformatted("Search in Context String");
+                    ImGui.SameLine();
+                    if (ImGui.InputText("##SearchInContextString", ref this.configuration.SearchString, 15))
+                    {
+                        this.configuration.Save();
+                    }
+
+                }
+                ImGui.Unindent();
+                if (ImGui.Checkbox("Enable Add Nick Name", ref this.configuration.EnableAddNickName))
+                {
+                    this.configuration.Save();
+                }
+                if (this.configuration.EnableAddNickName)
+                {
+                    ImGui.Spacing();
+                    ImGui.Indent();
+                    ImGui.TextUnformatted("Add Nick Name String");
+                    ImGui.SameLine();
+                    if (ImGui.InputText("##AddNickNameString", ref this.configuration.AddNickNameString, 15))
+                    {
+                        this.configuration.Save();
+                    }
+
+
+                }
+                ImGui.End();
             }
-            ImGui.End();
         }
     }
 }

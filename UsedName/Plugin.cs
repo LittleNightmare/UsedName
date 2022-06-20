@@ -34,6 +34,8 @@ namespace UsedName
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
+        // interrupt between UI and ContextMenu
+        internal string tempPlayerName { get; set;  } = "";
 
 
         public UsedName(
@@ -55,14 +57,15 @@ namespace UsedName
 
 
             // you might normally want to embed resources and load them from the manifest stream
-            this.PluginUi = new PluginUI(this.Configuration);
+            this.PluginUi = new PluginUI(this);
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "Use '/pname' or '/pname update' to update data from FriendList\n" +
                 "Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n" +
                 "Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname', only support player from FriendList\n" +
-                "(Format require:first last nickname; first last nick name)"
+                "(Format require:first last nickname; first last nick name)\n" +
+                "Use '/pname config' show plugin's setting"
             }) ;
 
             // first time
@@ -71,14 +74,14 @@ namespace UsedName
                 this.UpdatePlayerNames();
             }
 
-            // this.PluginInterface.UiBuilder.Draw += DrawUI;
-            // this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            this.PluginInterface.UiBuilder.Draw += DrawUI;
+            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
         }
 
         public void Dispose()
         {
-            // this.PluginUi.Dispose();
+            this.PluginUi.Dispose();
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
             this.ContextMenu.Dispose();
@@ -117,6 +120,10 @@ namespace UsedName
                 string nickName = parseName[1];
                 this.AddNickName(targetName, nickName);
             }
+            else if (args.StartsWith("config"))
+            {
+                this.DrawConfigUI();
+            }
             else
             {
                 Chat.PrintError($"Invalid parameter: {args}");
@@ -129,12 +136,16 @@ namespace UsedName
             this.PluginUi.Draw();
         }
 
+        internal void DrawMainUI()
+        {
+            this.PluginUi.Visible = true;
+        }
         private void DrawConfigUI()
         {
             this.PluginUi.SettingsVisible = true;
         }
 
-        private void UpdatePlayerNames()
+        internal void UpdatePlayerNames()
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
             while (friendList.MoveNext())
@@ -148,6 +159,11 @@ namespace UsedName
                     {
                         this.playersNameList[contentId].usedNames.Add(name);
                         this.playersNameList[contentId].currentName = name;
+                        if (Configuration.ShowNameChange)
+                        {
+                            var temp = string.IsNullOrEmpty(this.playersNameList[contentId].nickName) ? name : $"({this.playersNameList[contentId].nickName})";
+                            Chat.Print($"{temp} changed name to {this.playersNameList[contentId].currentName}\n");
+                        }
                     }
                 }
                 else
@@ -157,7 +173,7 @@ namespace UsedName
 
             }
             this.Configuration.Save();
-            Chat.Print("Update friends list completed");
+            Chat.Print("Update FriendList completed");
         }
 
         public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName=false)
@@ -184,11 +200,11 @@ namespace UsedName
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
                 result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
             }
-            Chat.Print($"Search result(s) for target [{targetName}]':\n{result}");
+            Chat.Print($"Search result(s) for target [{targetName}]:\n{result}");
             return result;
         }
-
-        private XivCommon.Functions.FriendList.FriendListEntry GetPlayerByNameFromFriendList(string name)
+        
+        public XivCommon.Functions.FriendList.FriendListEntry GetPlayerByNameFromFriendList(string name)
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
             while (friendList.MoveNext())
@@ -207,7 +223,7 @@ namespace UsedName
             var player = SearchPlayer(playerName);
             if (player.Count == 0)
             {
-                Chat.PrintError($"Cannot find player '{playerName}', Please try using '/pusedname update' to update the friends list, or check the spelling");
+                Chat.PrintError($"Cannot find player '{playerName}', Please try using '/pusedname update' to update FriendList, or check the spelling");
                 return;
             }
             if (player.Count > 1)

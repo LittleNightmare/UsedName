@@ -12,10 +12,7 @@ public class ContextMenu : IDisposable
     public ContextMenu(UsedName Plugin)
     {
         this.plugin = Plugin;
-        if (plugin.Configuration.ContextMenu)
-        {
-            Enable();
-        }
+        Enable();
     }
 
     public void Enable()
@@ -64,10 +61,21 @@ public class ContextMenu : IDisposable
         if (!IsMenuValid(args))
             return;
         
-        if (plugin.Configuration.ContextMenu)
+        if (plugin.Configuration.EnableSearchInContext)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem("Search Used Name", Search));
+            args.AddCustomItem(new GameObjectContextMenuItem(plugin.Configuration.SearchString, Search));
         }
+        
+        if (plugin.Configuration.EnableAddNickName)
+        {
+            args.AddCustomItem(new GameObjectContextMenuItem(plugin.Configuration.AddNickNameString, AddNickName));
+        }
+    }
+
+    private void AddNickName(GameObjectContextMenuItemSelectedArgs args)
+    {
+        plugin.tempPlayerName = args.Text.ToString();
+        plugin.DrawMainUI();
     }
 
     private void Search(GameObjectContextMenuItemSelectedArgs args)
