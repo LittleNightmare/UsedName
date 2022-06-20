@@ -64,7 +64,7 @@ namespace UsedName
             {
                 ImGui.Text($"{this.plugin.tempPlayerName}'s current nick name:");
                 var target = this.plugin.GetPlayerByNameFromFriendList(this.plugin.tempPlayerName);
-                if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry()))
+                if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry())||! this.configuration.playersNameList.TryGetValue(target.ContentId, out _))
                 {
                     ImGui.Text($"NO PLAYER FOUND. Please makesure {this.plugin.tempPlayerName} is your friend.\nThen, try update FriendList");
                     ImGui.Spacing();
