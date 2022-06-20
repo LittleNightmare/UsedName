@@ -127,9 +127,9 @@ namespace UsedName
                     {
                         this.configuration.Save();
                     }
+                    ImGui.Unindent();
 
                 }
-                ImGui.Unindent();
                 if (ImGui.Checkbox("Enable Add Nick Name", ref this.configuration.EnableAddNickName))
                 {
                     this.configuration.Save();
@@ -144,8 +144,7 @@ namespace UsedName
                     {
                         this.configuration.Save();
                     }
-
-
+                    ImGui.Unindent();
                 }
                 ImGui.End();
             }
