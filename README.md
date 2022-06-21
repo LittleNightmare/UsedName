@@ -1,8 +1,8 @@
 # UsedName
 
-一个针对FFXIV无备注名情况开发的插件。目前可以记录曾用名，添加昵称 *开发中*
+一个针对FFXIV无备注名情况开发的插件。目前可以记录曾用名，添加昵称
 
-A plugin developed for the case of FFXIV without a note name. Currently it is possible to record former names and add nicknames *in development*.
+A plugin developed for the case of FFXIV without a note name. Currently it is possible to record used names and add nicknames
 
 ## How to use
 
@@ -23,7 +23,7 @@ Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname
 Use '/pname config' show plugin's setting
 
 # TODO
-- [ ] GUI大致能游戏内浏览，添加/记录曾用名
+- [x] GUI大致能游戏内添加/记录曾用名
 - [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友
 
 # Thanks
