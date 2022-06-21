@@ -1,0 +1,20 @@
+{
+	"Update FriendList": "更新好友列表",
+	"Language:": "语言:",
+	"Name Change Check": "检查姓名变更",
+	"Enable Search In Context": "启用右键菜单搜索",
+	"Search in Context String": "搜索按钮",
+	"Enable Add Nick Name": "启用右键添加昵称",
+	"Add Nick Name String": "添加昵称按钮",
+	"Show palyer who changed name when update FriendList": "更新好友列表时，显示姓名变更",
+	"Update FriendList completed": "更新好友列表完成",
+	"Parameter error, length is '{0}'": "参数错误，长度为'{0}'",
+	"Invalid parameter: ": "非法参数: ",
+	" changed name to ": " 更改姓名为: ",
+	"Search result(s) for target [{0}]:": "[{0}]的搜索结果:",
+	"Cannot find player '{0}', Please try using '/pname update' to update FriendList, or check the spelling": "无法找到玩家'{0}'，请尝试用'/pname update'更新好友列表，或检查拼写",
+	"Find multiple '{0}', please search for players using the exact namet": "找到多个'{0}'，请使用准确的名字搜索",
+	"The nickname of {0} has been set to {1}": "{0}的昵称设置为{1}",
+	"Used Name: Add nick name": "Used Name: 添加昵称",
+	"'s current nick name:": "的当前昵称:"
+}

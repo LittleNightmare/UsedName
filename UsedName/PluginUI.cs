@@ -102,6 +102,23 @@ namespace UsedName
                 {
                     this.plugin.UpdatePlayerNames();
                 }
+                ImGui.Spacing();
+                ImGui.Text(this.plugin.loc.Localize("Language:"));
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(200);
+                if (ImGui.BeginCombo("##Language", this.configuration.Language))
+                {
+                    foreach (var lang in this.plugin.loc.GetLanguages())
+                    {
+                        if (ImGui.Selectable(lang.ToString()))
+                        {
+                            this.configuration.Language = lang;
+                            this.configuration.Save();
+                            this.plugin.loc.currentLanguage = lang;
+                        }
+                    }
+                    ImGui.EndCombo();
+                }
 
                 if (ImGui.Checkbox(this.plugin.loc.Localize("Name Change Check"), ref this.configuration.ShowNameChange))
                 {

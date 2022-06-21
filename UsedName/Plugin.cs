@@ -205,7 +205,7 @@ namespace UsedName
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
                 result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
             }
-            Chat.Print(this.loc.Localize($"Search result(s) for target ")+$"[{targetName}]:\n{result}");
+            Chat.Print(string.Format(this.loc.Localize("Search result(s) for target [{0}]:"), targetName)+$"\n{result}");
             return result;
         }
         
@@ -228,7 +228,7 @@ namespace UsedName
             var player = SearchPlayer(playerName);
             if (player.Count == 0)
             {
-                Chat.PrintError(string.Format(this.loc.Localize("Cannot find player '{0}', Please try using '/pusedname update' to update FriendList, or check the spelling"), playerName));
+                Chat.PrintError(string.Format(this.loc.Localize("Cannot find player '{0}', Please try using '/pname update' to update FriendList, or check the spelling"), playerName));
                 return;
             }
             if (player.Count > 1)

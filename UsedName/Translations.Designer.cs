@@ -22,7 +22,7 @@ namespace UsedName {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Translations {
+    public class Translations {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace UsedName {
         ///   返回此类使用的缓存的 ResourceManager 实例。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UsedName.Translations", typeof(Translations).Assembly);
@@ -51,7 +51,7 @@ namespace UsedName {
         ///   使用此强类型资源类的所有资源查找执行重写。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,9 +61,21 @@ namespace UsedName {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 {
+        ///	&quot;Update FriendList&quot;: &quot;鏇存柊濂藉弸鍒楄〃&quot;,
+        ///	&quot;Language:&quot;: &quot;璇█:&quot;,
+        ///	&quot;Name Change Check&quot;: &quot;妫€鏌ュ鍚嶅彉鏇?,
+        ///	&quot;Enable Search In Context&quot;: &quot;鍚敤鍙抽敭鑿滃崟鎼滅储&quot;,
+        ///	&quot;Search in Context String&quot;: &quot;鎼滅储鎸夐挳&quot;,
+        ///	&quot;Enable Add Nick Name&quot;: &quot;鍚敤鍙抽敭娣诲姞鏄电О&quot;,
+        ///	&quot;Add Nick Name String&quot;: &quot;娣诲姞鏄电О鎸夐挳&quot;,
+        ///	&quot;Show palyer who changed name when update FriendList&quot;: &quot;鏇存柊濂藉弸鍒楄〃鏃讹紝鏄剧ず濮撳悕鍙樻洿&quot;,
+        ///	&quot;Update FriendList completed&quot;: &quot;鏇存柊濂藉弸鍒楄〃瀹屾垚&quot;,
+        ///	&quot;Parameter error, length is &apos;{0}&apos;&quot;: &quot;鍙傛暟閿欒锛岄暱搴︿负&apos;{0}&apos;&quot;,
+        ///	&quot;Invalid parameter: &quot;: &quot;闈炴硶鍙傛暟: &quot;,
+        ///	&quot; changed name to &quot; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string zh_CN {
+        public static string zh_CN {
             get {
                 return ResourceManager.GetString("zh_CN", resourceCulture);
             }

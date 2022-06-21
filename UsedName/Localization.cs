@@ -20,13 +20,11 @@ namespace UsedName
             if (this.currentLanguage == "en") return message;
             if (languageDict.ContainsKey(message))
             {
-                if (!string.IsNullOrEmpty(languageDict[message]))
-                {
-                    return languageDict[message];
-                }
-                languageDict.Add(message, "");
+                return languageDict[message];
             }
-            languageDict.Add(message, "");
+#if DEBUG
+            languageDict.Add(message, message);
+#endif
             return message;
         }
         private void LoadLanguage(string language = "en")
@@ -41,12 +39,19 @@ namespace UsedName
 
         }
 
+        internal string[] GetLanguages()
+        {
+            string[] languages = { "en", "zh_CN" };
+            return languages;
+        }
+
 #if DEBUG
         public void StoreLanguage()
         {
             var str = JsonConvert.SerializeObject(this.languageDict);
             File.WriteAllText(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), this.currentLanguage + ".json"), str);
         }
+
 #endif
     }
 }
