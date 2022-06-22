@@ -30,11 +30,22 @@ namespace UsedName
         private void LoadLanguage(string language = "en")
         {
             if (language == "en") return;
+            Translations.Culture = new System.Globalization.CultureInfo(language);
             this.currentLanguage = language;
             var str = language switch{
                 _ => Translations.zh_CN
             };
-            this.languageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(str);
+            try
+            {
+                this.languageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(str);
+            }
+            catch (Exception)
+            {
+#if DEBUG
+                this.StoreLanguage();
+#endif
+            }
+           
 
 
         }
