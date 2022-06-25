@@ -151,32 +151,32 @@ namespace UsedName
         internal void UpdatePlayerNames()
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
-            var savedFriednList = this.Configuration.playersNameList;
+            var savedFriendList = this.Configuration.playersNameList;
             while (friendList.MoveNext())
             {
                 var player = friendList.Current;
                 var contentId = player.ContentId;
                 var name = player.Name.ToString();
-                if (savedFriednList.ContainsKey(contentId))
+                if (savedFriendList.ContainsKey(contentId))
                 {
-                    if (!this.Configuration.playersNameList[contentId].currentName.Equals(name))
+                    if (!savedFriendList[contentId].currentName.Equals(name))
                     {
-                        savedFriednList[contentId].usedNames.Add(name);
-                        savedFriednList[contentId].currentName = name;
                         if (Configuration.ShowNameChange)
                         {
-                            var temp = string.IsNullOrEmpty(savedFriednList[contentId].nickName) ? name : $"({savedFriednList[contentId].nickName})";
-                            Chat.Print(temp + this.loc.Localize($" changed name to ") + $"{savedFriednList[contentId].currentName}\n");
+                            var temp = string.IsNullOrEmpty(savedFriendList[contentId].nickName) ? savedFriendList[contentId].currentName : $"({savedFriendList[contentId].nickName})";
+                            Chat.Print(temp + this.loc.Localize($" changed name to ") + $"{name}\n");
                         }
+                        savedFriendList[contentId].usedNames.Add(savedFriendList[contentId].currentName);
+                        savedFriendList[contentId].currentName = name;
                     }
                 }
                 else
                 {
-                    savedFriednList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
+                    savedFriendList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
                 }
 
             }
-            this.Configuration.playersNameList = savedFriednList;
+            this.Configuration.playersNameList = savedFriendList;
             this.Configuration.Save();
             Chat.Print(this.loc.Localize("Update FriendList completed"));
         }
