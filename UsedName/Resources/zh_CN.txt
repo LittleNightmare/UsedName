@@ -16,5 +16,6 @@
 	"Find multiple '{0}', please search for players using the exact namet": "找到多个'{0}'，请使用准确的名字搜索",
 	"The nickname of {0} has been set to {1}": "{0}的昵称设置为{1}",
 	"Used Name: Add nick name": "Used Name: 添加昵称",
-	"'s current nick name:": "的当前昵称:"
+	"'s current nick name:": "的当前昵称:",
+	"NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList": "无法找到玩家。请确定 {0} 是你的好友\n并更新好友好友列表"
 }
