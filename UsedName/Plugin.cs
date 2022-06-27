@@ -37,8 +37,9 @@ namespace UsedName
         public Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
         internal GameNetwork Network { get; init; }
+        internal ClientState ClientState { get; init; }
         // internal DataManager Data { get; init; }
-        
+
         // interrupt between UI and ContextMenu
         internal string tempPlayerName { get; set;  } = "";
         internal Localization loc { get; set; }
@@ -49,12 +50,14 @@ namespace UsedName
             [RequiredVersion("1.0")] CommandManager commandManager,
             GameNetwork network,
             // DataManager data,
+            ClientState clientState,
             ChatGui chatGUI)
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
             this.ContextMenuBase = new DalamudContextMenuBase();
             this.Network = network;
+            this.ClientState = clientState;
             // this.Data = data;
             this.Chat = chatGUI;
 
@@ -165,6 +168,7 @@ namespace UsedName
         {
             if (!this.Configuration.EnableAutoUpdate) return;
             if (direction != NetworkMessageDirection.ZoneDown) return;
+            if (this.ClientState.IsLoggedIn == false) return;
             // CN only
             if (opCode != 0x030d) return;
             this.GetDataFromNetwork(dataPtr);
@@ -173,6 +177,24 @@ namespace UsedName
         private unsafe void GetDataFromNetwork(IntPtr dataPtr)
         {
             IDictionary<ulong, string> currentPlayersList = Structures.StructureReader.Read(dataPtr, Structures.StructureReader.StructureType.SocialList);
+            // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
+            var type = currentPlayersList.TryGetValue(0, out _) ? currentPlayersList[0] : "";
+            currentPlayersList.Remove(0);
+
+            if ((type == "1" && !this.Configuration.UpdateFromPartyList)||
+                (type == "2" && !this.Configuration.UpdateFromFriendList)||
+                (type == "4" && !this.Configuration.UpdateFromPlayerSearch))
+            {
+                return;
+            }
+            // party list includes the player hiself, remove it
+            currentPlayersList.Remove(this.ClientState.LocalContentId);
+#if DEBUG
+            foreach (var player in currentPlayersList)
+            {
+                PluginLog.Log($"{player.Key}:{player.Value}:{this.Configuration.playersNameList.ContainsKey(player.Key)}");
+            }
+#endif
             UpdatePlayerNames(currentPlayersList, showHint: false);
         }
 

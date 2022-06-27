@@ -129,6 +129,24 @@ namespace UsedName
                 {
                     ImGui.SetTooltip(this.plugin.loc.Localize("Automatically update player name when opening FriendList"));
                 }
+                if (this.configuration.EnableAutoUpdate)
+                {
+                    ImGui.Spacing();
+                    ImGui.Indent();
+                    if (ImGui.Checkbox(this.plugin.loc.Localize("Update From PartyList"), ref this.configuration.UpdateFromPartyList))
+                    {
+                        this.configuration.Save();
+                    }
+                    if (ImGui.Checkbox(this.plugin.loc.Localize("Update From FriendList"), ref this.configuration.UpdateFromFriendList))
+                    {
+                        this.configuration.Save();
+                    }
+                    if (ImGui.Checkbox(this.plugin.loc.Localize("Update From PlayerSearch"), ref this.configuration.UpdateFromPlayerSearch))
+                    {
+                        this.configuration.Save();
+                    }
+                    ImGui.Unindent();
+                }
 
                 if (ImGui.Checkbox(this.plugin.loc.Localize("Name Change Check"), ref this.configuration.ShowNameChange))
                 {

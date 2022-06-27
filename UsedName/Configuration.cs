@@ -22,6 +22,9 @@ namespace UsedName
         public string AddNickNameString  = "Add Nick Name";
 
         public bool EnableAutoUpdate = false;
+        public bool UpdateFromPartyList = false;
+        public bool UpdateFromFriendList = true;
+        public bool UpdateFromPlayerSearch = false;
 
         public class PlayersNames
         {

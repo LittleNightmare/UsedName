@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Dalamud.Logging;
 
 namespace UsedName.Structures
 {
@@ -23,14 +24,21 @@ namespace UsedName.Structures
             {
                 case StructureType.SocialList:
                     socialList = (SocialList)Marshal.PtrToStructure(dataPtr, typeof(SocialList));
+#if DEBUG
+                    PluginLog.Log($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.type}");
+#endif
+                    // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
+                    //if (socialList.type != 2) break;
                     foreach (var entry in socialList.entries)
                     {
                         var name = Encoding.UTF8.GetString(entry.name).TrimEnd('\0');
                         if (string.IsNullOrEmpty(name)) continue;
                         result.Add(entry.contentId, name);
                     }
+                    result.Add(0, socialList.type.ToString());
                     break;
                 case StructureType.BlackList:
+                    // not work, i cannot find any player's name, it is always empty. CN opcode is 0x0250
                     blackList = (BlackList)Marshal.PtrToStructure(dataPtr, typeof(BlackList));
                     foreach (var entry in blackList.entry)
                     {
@@ -40,7 +48,7 @@ namespace UsedName.Structures
                     }
                     break;
                 default:
-                    return null;
+                    return result;
             }
             return result;
         }
