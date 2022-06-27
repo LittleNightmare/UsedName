@@ -21,6 +21,8 @@ namespace UsedName
         public bool EnableAddNickName = true;
         public string AddNickNameString  = "Add Nick Name";
 
+        public bool EnableAutoUpdate = false;
+
         public class PlayersNames
         {
             public string currentName { get; set; }

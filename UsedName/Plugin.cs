@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using Dalamud;
 using Dalamud.Game;
+using Dalamud.Game.Network;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Gui;
 using Dalamud.ContextMenu;
@@ -12,6 +13,9 @@ using Dalamud.Interface.Internal.Notifications;
 using XivCommon;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+// using Dalamud.Data;
+using Dalamud.Logging;
 
 namespace UsedName
 {
@@ -32,6 +36,9 @@ namespace UsedName
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
+        internal GameNetwork Network { get; init; }
+        // internal DataManager Data { get; init; }
+        
         // interrupt between UI and ContextMenu
         internal string tempPlayerName { get; set;  } = "";
         internal Localization loc { get; set; }
@@ -40,17 +47,21 @@ namespace UsedName
         public UsedName(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager,
+            GameNetwork network,
+            // DataManager data,
             ChatGui chatGUI)
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
             this.ContextMenuBase = new DalamudContextMenuBase();
+            this.Network = network;
+            // this.Data = data;
+            this.Chat = chatGUI;
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
 
             this.Common = new XivCommonBase();
-            this.Chat = chatGUI;
             this.ContextMenu = new ContextMenu(this);
 
             //this.loc = new Localization(this.Configuration.Language);
@@ -71,17 +82,19 @@ namespace UsedName
             // first time
             if (this.Configuration.playersNameList.Count <= 0)
             {
-                this.UpdatePlayerNames();
+                this.GetDataFromMemory();
             }
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            this.Network.NetworkMessage += OnNetworkEvent;
 
         }
 
         public void Dispose()
         {
             this.PluginUi.Dispose();
+            this.Network.NetworkMessage -= OnNetworkEvent;
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
             this.ContextMenu.Dispose();
@@ -94,7 +107,7 @@ namespace UsedName
         {
             if (args == "update"|| args == "")
             {
-                this.UpdatePlayerNames();
+                this.GetDataFromMemory();
             }
             else if (args.StartsWith("search"))
             {
@@ -147,16 +160,43 @@ namespace UsedName
         {
             this.PluginUi.SettingsVisible = true;
         }
+        
+        private void OnNetworkEvent(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
+        {
+            if (!this.Configuration.EnableAutoUpdate) return;
+            if (direction != NetworkMessageDirection.ZoneDown) return;
+            // CN only
+            if (opCode != 0x030d) return;
+            this.GetDataFromNetwork(dataPtr);
+        }
 
-        internal void UpdatePlayerNames()
+        private unsafe void GetDataFromNetwork(IntPtr dataPtr)
+        {
+            IDictionary<ulong, string> currentPlayersList = Structures.StructureReader.Read(dataPtr, Structures.StructureReader.StructureType.SocialList);
+            UpdatePlayerNames(currentPlayersList, showHint: false);
+        }
+
+        internal void GetDataFromMemory()
         {
             var friendList = Common.Functions.FriendList.List.GetEnumerator();
-            var savedFriendList = this.Configuration.playersNameList;
+            IDictionary<ulong, string> currentPlayersList = new Dictionary<ulong, string>();
             while (friendList.MoveNext())
             {
                 var player = friendList.Current;
                 var contentId = player.ContentId;
                 var name = player.Name.ToString();
+                currentPlayersList.Add(contentId, name);
+            }
+            UpdatePlayerNames(currentPlayersList);
+        }
+
+        internal void UpdatePlayerNames(IDictionary<ulong, string> currentPlayersList, bool showHint=true)
+        {
+            var savedFriendList = this.Configuration.playersNameList;
+            foreach (var player in currentPlayersList)
+            {
+                var contentId = player.Key;
+                var name = player.Value;
                 if (savedFriendList.ContainsKey(contentId))
                 {
                     if (!savedFriendList[contentId].currentName.Equals(name))
@@ -178,7 +218,11 @@ namespace UsedName
             }
             this.Configuration.playersNameList = savedFriendList;
             this.Configuration.Save();
-            Chat.Print(this.loc.Localize("Update FriendList completed"));
+            if (showHint)
+            {
+                Chat.Print(this.loc.Localize("Update FriendList completed"));
+            }
+            
         }
 
         public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName=false)

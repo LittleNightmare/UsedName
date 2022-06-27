@@ -70,7 +70,7 @@ namespace UsedName
                     ImGui.Spacing();
                     if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
                     {
-                        this.plugin.UpdatePlayerNames();
+                        this.plugin.GetDataFromMemory();
                     }
                 }
                 else
@@ -100,7 +100,7 @@ namespace UsedName
             {
                 if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
                 {
-                    this.plugin.UpdatePlayerNames();
+                    this.plugin.GetDataFromMemory();
                 }
                 ImGui.Spacing();
                 ImGui.Text(this.plugin.loc.Localize("Language:"));
@@ -120,9 +120,18 @@ namespace UsedName
                     ImGui.EndCombo();
                 }
 
+                // checkbox EnableAutoUpdate
+                if(ImGui.Checkbox(this.plugin.loc.Localize("Enable Auto Update"), ref this.configuration.EnableAutoUpdate))
+                {
+                    this.configuration.Save();
+                }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(this.plugin.loc.Localize("Automatically update player name when opening FriendList"));
+                }
+
                 if (ImGui.Checkbox(this.plugin.loc.Localize("Name Change Check"), ref this.configuration.ShowNameChange))
                 {
-                    // can save immediately on change, if you don't want to provide a "Save and Close" button
                     this.configuration.Save();
                 }
                 if (ImGui.IsItemHovered())

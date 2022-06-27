@@ -17,5 +17,7 @@
 	"The nickname of {0} has been set to {1}": "{0}的昵称设置为{1}",
 	"Used Name: Add nick name": "Used Name: 添加昵称",
 	"'s current nick name:": "的当前昵称:",
-	"NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList": "无法找到玩家。请确定 {0} 是你的好友\n并更新好友好友列表"
+	"NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList": "无法找到玩家。请确定 {0} 是你的好友\n并更新好友好友列表",
+	"Enable Auto Update": "启用自动更新",
+	"Automatically update player name when opening FriendList": "打开好友列表时，自动更新玩家名"
 }
