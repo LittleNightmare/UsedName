@@ -26,6 +26,8 @@ namespace UsedName
         public bool UpdateFromFriendList = true;
         public bool UpdateFromPlayerSearch = false;
 
+        public int SocialListOpcode = 0;
+
         public class PlayersNames
         {
             public string currentName { get; set; }

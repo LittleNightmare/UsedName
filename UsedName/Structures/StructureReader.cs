@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using Dalamud.Logging;
 
 namespace UsedName.Structures
@@ -15,17 +14,53 @@ namespace UsedName.Structures
             SocialList,
             BlackList
         }
-        public static unsafe IDictionary<ulong, string> Read(IntPtr dataPtr, StructureType type)
+        public static unsafe IDictionary<ulong, string> Read(byte[] data, StructureType type)
         {
             var result = new Dictionary<ulong, string>();
-            SocialList socialList;
-            BlackList blackList;
+            SocialList socialList = new ();
+            BlackList blackList = new ();
+            
+            // transfer data to InPtr
+            int size;
+            IntPtr buffer;
             switch (type)
             {
                 case StructureType.SocialList:
-                    socialList = (SocialList)Marshal.PtrToStructure(dataPtr, typeof(SocialList));
+                    size = Marshal.SizeOf(typeof(SocialList));
+                    buffer = Marshal.AllocHGlobal(size);
+                    try
+                    {
+                        Marshal.Copy(data, 0, buffer, size);
+                        socialList = (SocialList)Marshal.PtrToStructure(buffer, typeof(SocialList));
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(buffer);
+                    }
+                    break;
+                case StructureType.BlackList:
+                    size = Marshal.SizeOf(typeof(SocialList));
+                    buffer = Marshal.AllocHGlobal(size);
+                    Marshal.Copy(data, 0, buffer, size);
+                    try
+                    {
+                        Marshal.Copy(data, 0, buffer, size);
+                        blackList = (BlackList)Marshal.PtrToStructure(buffer, typeof(BlackList));
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(buffer);
+                    }
+                    break;
+            }
+
+            // Adjust data
+            switch (type)
+            {
+                case StructureType.SocialList:
 #if DEBUG
                     PluginLog.Log($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.type}");
+                    PluginLog.LogDebug($"At padding {socialList.padding}, {socialList.padding1}, {socialList.padding2},{socialList.padding3}");
 #endif
                     // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
                     //if (socialList.type != 2) break;
@@ -33,13 +68,15 @@ namespace UsedName.Structures
                     {
                         var name = Encoding.UTF8.GetString(entry.name).TrimEnd('\0');
                         if (string.IsNullOrEmpty(name)) continue;
-                        result.Add(entry.contentId, name);
+                        if(!result.TryAdd(entry.contentId, name))
+                        {
+                            PluginLog.LogWarning($"Duplicate entry {entry.contentId} {name}");
+                        }
                     }
                     result.Add(0, socialList.type.ToString());
                     break;
                 case StructureType.BlackList:
                     // not work, i cannot find any player's name, it is always empty. CN opcode is 0x0250
-                    blackList = (BlackList)Marshal.PtrToStructure(dataPtr, typeof(BlackList));
                     foreach (var entry in blackList.entry)
                     {
                         var name = Encoding.UTF8.GetString(entry.name).TrimEnd('\0'); ;

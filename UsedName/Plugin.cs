@@ -16,6 +16,7 @@ using System.Linq;
 using System;
 // using Dalamud.Data;
 using Dalamud.Logging;
+using System.Runtime.InteropServices;
 
 namespace UsedName
 {
@@ -67,7 +68,6 @@ namespace UsedName
             this.Common = new XivCommonBase();
             this.ContextMenu = new ContextMenu(this);
 
-            //this.loc = new Localization(this.Configuration.Language);
             this.loc = new Localization(this.Configuration.Language);
 
             // you might normally want to embed resources and load them from the manifest stream
@@ -88,10 +88,29 @@ namespace UsedName
                 this.GetDataFromMemory();
             }
 
+            if (this.Configuration.SocialListOpcode == 0)
+            {
+                this.UpdateOpcode();
+            }
+
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
             this.Network.NetworkMessage += OnNetworkEvent;
 
+        }
+
+        private void UpdateOpcode()
+        {
+            //TODO place opcode online
+            if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
+            {
+                this.Configuration.SocialListOpcode = 0x030d;
+            }
+            else
+            {
+                this.Configuration.SocialListOpcode = 0x0303;
+            }
+            this.Configuration.Save();
         }
 
         public void Dispose()
@@ -115,7 +134,7 @@ namespace UsedName
             else if (args.StartsWith("search"))
             {
                 var temp = args.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
-                var targetName = "";
+                string targetName;
                 if (temp.Length == 2)
                 {
                     targetName = temp[1];
@@ -167,16 +186,29 @@ namespace UsedName
         private void OnNetworkEvent(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
         {
             if (!this.Configuration.EnableAutoUpdate) return;
+            if (!this.ClientState.IsLoggedIn) return;
             if (direction != NetworkMessageDirection.ZoneDown) return;
-            if (this.ClientState.IsLoggedIn == false) return;
-            // CN only
-            if (opCode != 0x030d) return;
-            this.GetDataFromNetwork(dataPtr);
+            if (this.ClientState.LocalPlayer == null || this.ClientState.TerritoryType == 0) return;
+            if (opCode != this.Configuration.SocialListOpcode) return;
+
+            int size = Marshal.SizeOf(typeof(Structures.SocialList));
+            try
+            {
+                byte[] bytes = new byte[size];
+                Marshal.Copy(dataPtr, bytes, 0, size);
+                GetDataFromNetwork(bytes);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
         }
 
-        private unsafe void GetDataFromNetwork(IntPtr dataPtr)
+        private unsafe void GetDataFromNetwork(byte[] data)
         {
-            IDictionary<ulong, string> currentPlayersList = Structures.StructureReader.Read(dataPtr, Structures.StructureReader.StructureType.SocialList);
+            IDictionary<ulong, string> currentPlayersList;
+            currentPlayersList = Structures.StructureReader.Read(data, Structures.StructureReader.StructureType.SocialList);
             // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
             var type = currentPlayersList.TryGetValue(0, out _) ? currentPlayersList[0] : "";
             currentPlayersList.Remove(0);
@@ -192,10 +224,10 @@ namespace UsedName
 #if DEBUG
             foreach (var player in currentPlayersList)
             {
-                PluginLog.Log($"{player.Key}:{player.Value}:{this.Configuration.playersNameList.ContainsKey(player.Key)}");
+                PluginLog.Debug($"{player.Key}:{player.Value}:{this.Configuration.playersNameList.ContainsKey(player.Key)}");
             }
 #endif
-            UpdatePlayerNames(currentPlayersList, showHint: false);
+            this.UpdatePlayerNames(currentPlayersList, showHint: false);
         }
 
         internal void GetDataFromMemory()
