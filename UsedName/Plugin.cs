@@ -258,7 +258,7 @@ namespace UsedName
                         if (Configuration.ShowNameChange)
                         {
                             var temp = string.IsNullOrEmpty(savedFriendList[contentId].nickName) ? savedFriendList[contentId].currentName : $"({savedFriendList[contentId].nickName})";
-                            Chat.Print(temp + this.loc.Localize($" changed name to ") + $"{name}\n");
+                            Chat.Print(temp + this.loc.Localize($" changed name to ") + $"{name}");
                         }
                         savedFriendList[contentId].usedNames.Add(savedFriendList[contentId].currentName);
                         savedFriendList[contentId].currentName = name;
