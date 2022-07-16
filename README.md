@@ -1,8 +1,8 @@
 # UsedName
 
-一个针对FFXIV无备注名情况开发的插件。目前可以记录曾用名，添加昵称
+一个针对FFXIV无备注名情况开发的插件。目前可以记录曾用名，添加昵称。可以通过网络包，自动更新曾用名（在打开对应列表时）支持范围包括：小队列表，好友名单，玩家搜索
 
-A plugin developed for the case of FFXIV without a note name. Currently it is possible to record used names and add nicknames
+A plugin developed for the case of FFXIV without a note name. Currently it is possible to record used names and add nicknames. The used names can be updated automatically through the network package. (When opening the list) Supported: Party List, Friend List, Player Search
 
 ## How to use
 
@@ -23,8 +23,10 @@ Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname
 Use '/pname config' show plugin's setting
 
 # TODO
-- [x] GUI大致能游戏内添加/记录曾用名
-- [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友
+- [x] GUI能游戏内添加/记录昵称
+- [x] 给大部分能有ContentID的地方，支持功能，不局限于好友
+- [ ] 黑名单支持 Support Blacklist
+- [ ] 区分`找不到该角色`和普通跨服好友 Distinguish `Unable to Retrieve` with noral cross world friend
 
 # Thanks
 感谢FFLogsViewer各个分支的参考，还有zhouhuichen741从远路把我拽回来。
