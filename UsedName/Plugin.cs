@@ -30,8 +30,8 @@ namespace UsedName
         private XivCommonBase Common { get; }
         public ChatGui Chat { get; private set; }
 
-        public DalamudContextMenuBase ContextMenuBase { get; private set; }
-        public ContextMenu ContextMenu { get; private set; }
+        public DalamudContextMenu ContextMenu { get; private set; }
+        public ContextMenu ContextMenuManager { get; private set; }
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
@@ -56,17 +56,17 @@ namespace UsedName
         {
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
-            this.ContextMenuBase = new DalamudContextMenuBase();
             this.Network = network;
             this.ClientState = clientState;
             // this.Data = data;
             this.Chat = chatGUI;
+            this.ContextMenu = new DalamudContextMenu();
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
 
             this.Common = new XivCommonBase();
-            this.ContextMenu = new ContextMenu(this);
+            this.ContextMenuManager = new ContextMenu(this);
 
             this.loc = new Localization(this.Configuration.Language);
 
@@ -119,6 +119,7 @@ namespace UsedName
             this.Network.NetworkMessage -= OnNetworkEvent;
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
+            this.ContextMenuManager.Dispose();
             this.ContextMenu.Dispose();
 #if DEBUG
             this.loc.StoreLanguage();

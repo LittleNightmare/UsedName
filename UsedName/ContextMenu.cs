@@ -17,13 +17,13 @@ public class ContextMenu : IDisposable
 
     public void Enable()
     {
-        plugin.ContextMenuBase.Functions.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
-        plugin.ContextMenuBase.Functions.ContextMenu.OnOpenGameObjectContextMenu += OnOpenContextMenu;
+        plugin.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
+        plugin.ContextMenu.OnOpenGameObjectContextMenu += OnOpenContextMenu;
     }
 
     public void Disable()
     {
-        plugin.ContextMenuBase.Functions.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
+        plugin.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
     }
 
     public void Dispose()
