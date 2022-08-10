@@ -104,7 +104,7 @@ namespace UsedName
             //TODO place opcode online
             if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
             {
-                this.Configuration.SocialListOpcode = 0x030d;
+                this.Configuration.SocialListOpcode = 0x0396;
             }
             else
             {
@@ -123,6 +123,7 @@ namespace UsedName
 #if DEBUG
             this.loc.StoreLanguage();
 #endif
+            GC.SuppressFinalize(this);
         }
 
         private void OnCommand(string command, string args)
