@@ -67,7 +67,17 @@ namespace UsedName.Structures
                     foreach (var entry in socialList.entries)
                     {
                         var name = Encoding.UTF8.GetString(entry.name).TrimEnd('\0');
-                        if (string.IsNullOrEmpty(name)) continue;
+                        // some player would not get name. some are Unable to Retrieve, some from other world. are they really save on local? 
+                        if (string.IsNullOrEmpty(name)) 
+                        {
+#if DEBUG
+                            // entry.bytes is only different part. it seems to consist of 3 parts. At the middle 4 bytes always 00-00-00-00
+                            PluginLog.Log($"name IsNullOrEmpty {entry.contentId}:{name}\n" +
+                                $"{BitConverter.ToString(entry.bytes)}");
+#endif
+                            continue;
+                        }
+
                         if(!result.TryAdd(entry.contentId, name))
                         {
                             PluginLog.LogWarning($"Duplicate entry {entry.contentId} {name}");
