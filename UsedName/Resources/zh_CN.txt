@@ -22,5 +22,9 @@
 	"Automatically update player name when opening FriendList": "打开好友列表时，自动更新玩家名",
 	"Update From PartyList": "小队列表更新",
 	"Update From FriendList": "好友列表更新",
-	"Update From PlayerSearch": "玩家搜索更新"
+	"Check Opcode Update": "检查Opcode更新",
+	"Update From PlayerSearch": "玩家搜索更新",
+	"Auto Check Opcode Update": "自动检测Opcode更新",
+	"Manually check for Opcode updates": "手动检查Opcode更新",
+	"Auto check update Opcode after game update": "当游戏更新后，自动检查Opcode更新"
 }

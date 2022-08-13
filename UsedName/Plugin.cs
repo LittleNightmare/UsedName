@@ -17,6 +17,7 @@ using System;
 // using Dalamud.Data;
 using Dalamud.Logging;
 using System.Runtime.InteropServices;
+using Dalamud.Data;
 
 namespace UsedName
 {
@@ -39,8 +40,7 @@ namespace UsedName
         private PluginUI PluginUi { get; init; }
         internal GameNetwork Network { get; init; }
         internal ClientState ClientState { get; init; }
-        // internal DataManager Data { get; init; }
-
+        internal DataManager DataManager { get; init; }
         // interrupt between UI and ContextMenu
         internal string tempPlayerName { get; set;  } = "";
         internal Localization loc { get; set; }
@@ -50,7 +50,7 @@ namespace UsedName
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
             [RequiredVersion("1.0")] CommandManager commandManager,
             GameNetwork network,
-            // DataManager data,
+            DataManager data,
             ClientState clientState,
             ChatGui chatGUI)
         {
@@ -58,7 +58,7 @@ namespace UsedName
             this.CommandManager = commandManager;
             this.Network = network;
             this.ClientState = clientState;
-            // this.Data = data;
+            this.DataManager = data;
             this.Chat = chatGUI;
             this.ContextMenu = new DalamudContextMenu();
 
@@ -92,29 +92,50 @@ namespace UsedName
             {
                 this.UpdateOpcode();
             }
+            var gameVersiontext = DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
+            if (new GameVersion(Configuration.GameVersion) < new GameVersion(gameVersiontext)&&Configuration.AutoCheckOpcodeUpdate)
+            {
+                this.UpdateOpcode();
+            }
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
             this.Network.NetworkMessage += OnNetworkEvent;
 
         }
-
-        private void UpdateOpcode()
+        
+        public void UpdateOpcode()
         {
             //TODO place opcode online
+            var lastOpcodeVersion = new GameVersion(Configuration.GameVersion);
             if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
             {
-                this.Configuration.SocialListOpcode = 0x0396;
+                var lastestOpcodeVersionCN = new GameVersion("2022.07.22.0000.0000");
+                if (lastOpcodeVersion < lastestOpcodeVersionCN)
+                {
+                    // 6.1
+                    Configuration.SocialListOpcode = 0x0396;
+                    Configuration.GameVersion = lastestOpcodeVersionCN.ToString();
+                }
+                
             }
             else
             {
-                this.Configuration.SocialListOpcode = 0x0303;
+                var lastestOpcodeVersionGlobal = new GameVersion("2022.07.08.0000.0000");
+                if (lastOpcodeVersion < lastestOpcodeVersionGlobal)
+                {
+                    // waiting for someone find it, now is 6.15? i guess
+                    Configuration.SocialListOpcode = 0x0303;
+                    Configuration.GameVersion = lastestOpcodeVersionGlobal.ToString();
+                }
             }
             this.Configuration.Save();
         }
 
         public void Dispose()
         {
+            this.PluginInterface.UiBuilder.Draw -= DrawUI;
+            this.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
             this.PluginUi.Dispose();
             this.Network.NetworkMessage -= OnNetworkEvent;
             this.CommandManager.RemoveHandler(commandName);
@@ -211,13 +232,23 @@ namespace UsedName
         {
             IDictionary<ulong, string> currentPlayersList;
             currentPlayersList = Structures.StructureReader.Read(data, Structures.StructureReader.StructureType.SocialList);
-            // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
+            // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????; 8 = New Adventurer/Returner; 9 = Mentor
             var type = currentPlayersList.TryGetValue(0, out _) ? currentPlayersList[0] : "";
             currentPlayersList.Remove(0);
+  
+            string[] knownType = { "1", "2", "4", "8", "9" };
+            if (!knownType.Contains(type))
+            {
+#if DEBUG
+                Chat.Print($"UsedName: Find Unknown type: {type}");
+#endif
+                return;
+            }
 
             if ((type == "1" && !this.Configuration.UpdateFromPartyList)||
                 (type == "2" && !this.Configuration.UpdateFromFriendList)||
-                (type == "4" && !this.Configuration.UpdateFromPlayerSearch))
+                (type == "4" && !this.Configuration.UpdateFromPlayerSearch)||
+                type == "8" || type == "9")
             {
                 return;
             }

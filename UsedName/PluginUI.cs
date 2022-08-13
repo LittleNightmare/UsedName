@@ -35,7 +35,7 @@ namespace UsedName
         
         public void Dispose()
         {
-            
+            GC.SuppressFinalize(this);
         }
 
         public void Draw()
@@ -95,7 +95,7 @@ namespace UsedName
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(300, 350), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(550, 410), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Used Name Settings", ref this.settingsVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
@@ -189,6 +189,24 @@ namespace UsedName
                         this.configuration.Save();
                     }
                     ImGui.Unindent();
+                }
+                ImGui.Spacing();
+                if (ImGui.Checkbox(this.plugin.loc.Localize("Auto Check Opcode Update"), ref this.configuration.AutoCheckOpcodeUpdate))
+                {
+                    this.configuration.Save();
+                }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(this.plugin.loc.Localize("Auto check update Opcode after game update"));
+                }
+                ImGui.SameLine();
+                if (ImGui.Button(this.plugin.loc.Localize("Check Opcode Update")))
+                {
+                    this.plugin.UpdateOpcode();
+                }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(this.plugin.loc.Localize("Manually check for Opcode updates"));
                 }
                 ImGui.End();
             }

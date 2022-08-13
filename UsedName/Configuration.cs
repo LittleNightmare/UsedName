@@ -26,7 +26,9 @@ namespace UsedName
         public bool UpdateFromFriendList = true;
         public bool UpdateFromPlayerSearch = false;
 
+        public bool AutoCheckOpcodeUpdate = true;
         public int SocialListOpcode = 0;
+        public string GameVersion = (new Dalamud.Game.GameVersion(0000)).ToString();
 
         public class PlayersNames
         {
