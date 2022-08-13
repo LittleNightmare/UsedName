@@ -24,7 +24,7 @@ Use '/pname config' show plugin's setting
 
 # TODO
 - [x] GUI能游戏内添加/记录昵称
-- [x] 给大部分能有ContentID的地方，支持功能，不局限于好友
+- [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友。（新人频道的指导者和新人）
 - [ ] 黑名单支持 Support Blacklist
 - [ ] 区分`找不到该角色`和普通跨服好友 Distinguish `Unable to Retrieve` with noral cross world friend
 

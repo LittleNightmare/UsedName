@@ -3,11 +3,12 @@
   <PropertyGroup>
     <Authors>LittleNightmare</Authors>
     <Company></Company>
-    <Version>0.7.4.1</Version>
+    <Version>0.7.4.3</Version>
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
     <Configurations>Debug;Release</Configurations>
+	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <PropertyGroup>
