@@ -22,9 +22,11 @@
 	"Automatically update player name when opening FriendList": "打开好友列表时，自动更新玩家名",
 	"Update From PartyList": "小队列表更新",
 	"Update From FriendList": "好友列表更新",
-	"Check Opcode Update": "检查Opcode更新",
+	"Renew Opcode": "更新Opcode",
 	"Update From PlayerSearch": "玩家搜索更新",
-	"Auto Check Opcode Update": "自动检测Opcode更新",
-	"Manually check for Opcode updates": "手动检查Opcode更新",
-	"Auto check update Opcode after game update": "当游戏更新后，自动检查Opcode更新"
+	"Auto Renew Opcode": "自动更新Opcode",
+	"Manually renew for Opcode updates, please open PartyList after click button immediately to renew Opcode": "手动更新Opcode，请点击按钮后，立刻打开小队列表完成更新操作",
+	"Auto renew Opcode after game update, please open PartyList to renew Opcode": "当游戏更新后，自动更新Opcode。请打开小队列表完成更新操作",
+	"Opcode detected\n Game version: {0}\nOpcode: {1}": "检测到Opcode\n 游戏版本: {0}\nOpcode: {1}",
+	"\nIf you find that the plugin cannot update the player information automatically, it may be that the detected opcode is wrong. Please click Renew Opcode to solve it": "\n如果您发现插件无法自动更新玩家信息，可能是检测到的opcode是错的。请点击 更新Opcode 来解决这个问题",
 }

@@ -191,22 +191,23 @@ namespace UsedName
                     ImGui.Unindent();
                 }
                 ImGui.Spacing();
-                if (ImGui.Checkbox(this.plugin.loc.Localize("Auto Check Opcode Update"), ref this.configuration.AutoCheckOpcodeUpdate))
+                if (ImGui.Checkbox(this.plugin.loc.Localize("Auto Renew Opcode"), ref this.configuration.AutoCheckOpcodeUpdate))
                 {
                     this.configuration.Save();
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(this.plugin.loc.Localize("Auto check update Opcode after game update"));
+                    ImGui.SetTooltip(this.plugin.loc.Localize("Auto renew Opcode after game update, please open PartyList to renew Opcode") +
+                        this.plugin.loc.Localize("\nIf you find that the plugin cannot update the player information automatically, it may be that the detected opcode is wrong. Please click Renew Opcode to solve it"));
                 }
                 ImGui.SameLine();
-                if (ImGui.Button(this.plugin.loc.Localize("Check Opcode Update")))
+                if (ImGui.Button(this.plugin.loc.Localize("Renew Opcode")))
                 {
-                    this.plugin.UpdateOpcode();
+                    this.plugin.detectOpcode = true;
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(this.plugin.loc.Localize("Manually check for Opcode updates"));
+                    ImGui.SetTooltip(this.plugin.loc.Localize("Manually renew for Opcode updates, please open PartyList after click button immediately to renew Opcode"));
                 }
                 ImGui.End();
             }

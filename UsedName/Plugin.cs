@@ -29,10 +29,10 @@ namespace UsedName
         private const string commandName = "/pname";
 
         private XivCommonBase Common { get; }
-        public ChatGui Chat { get; private set; }
+        internal ChatGui Chat { get; private set; }
 
-        public DalamudContextMenu ContextMenu { get; private set; }
-        public ContextMenu ContextMenuManager { get; private set; }
+        internal DalamudContextMenu ContextMenu { get; private set; }
+        internal ContextMenu ContextMenuManager { get; private set; }
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
@@ -44,6 +44,7 @@ namespace UsedName
         // interrupt between UI and ContextMenu
         internal string tempPlayerName { get; set;  } = "";
         internal Localization loc { get; set; }
+        internal bool detectOpcode { get; set; } = false;
 
 
         public UsedName(
@@ -90,23 +91,26 @@ namespace UsedName
 
             if (this.Configuration.SocialListOpcode == 0)
             {
-                this.UpdateOpcode();
+                this.detectOpcode = true;
+                //this.UpdateOpcode();
             }
             var gameVersiontext = DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
             if (new GameVersion(Configuration.GameVersion) < new GameVersion(gameVersiontext)&&Configuration.AutoCheckOpcodeUpdate)
             {
-                this.UpdateOpcode();
+                this.detectOpcode = true;
             }
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            this.Network.NetworkMessage += OnNetworkEventDetectOpcode;
             this.Network.NetworkMessage += OnNetworkEvent;
 
+
         }
-        
+
         public void UpdateOpcode()
         {
-            //TODO place opcode online
+            //not need anymore
             var lastOpcodeVersion = new GameVersion(Configuration.GameVersion);
             if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
             {
@@ -137,6 +141,7 @@ namespace UsedName
             this.PluginInterface.UiBuilder.Draw -= DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
             this.PluginUi.Dispose();
+            this.Network.NetworkMessage -= OnNetworkEventDetectOpcode;
             this.Network.NetworkMessage -= OnNetworkEvent;
             this.CommandManager.RemoveHandler(commandName);
             this.Common.Dispose();
@@ -209,6 +214,7 @@ namespace UsedName
         private void OnNetworkEvent(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
         {
             if (!this.Configuration.EnableAutoUpdate) return;
+            if (this.detectOpcode) return;
             if (!this.ClientState.IsLoggedIn) return;
             if (direction != NetworkMessageDirection.ZoneDown) return;
             if (this.ClientState.LocalPlayer == null || this.ClientState.TerritoryType == 0) return;
@@ -226,6 +232,67 @@ namespace UsedName
                 throw;
             }
             
+        }
+        private bool IncludesBytes(byte[] source, byte[] search)
+        {
+            if (search == null) return false;
+
+            for (var i = 0; i < source.Length - search.Length; ++i)
+            {
+                var result = true;
+                for (var j = 0; j < search.Length; ++j)
+                {
+                    if (search[j] != source[i + j])
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+
+                if (result)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void OnNetworkEventDetectOpcode(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
+        {
+            if (!this.detectOpcode) return;
+            if (!this.ClientState.IsLoggedIn) return;
+            if (direction != NetworkMessageDirection.ZoneDown) return;
+            if (this.ClientState.LocalPlayer == null || this.ClientState.TerritoryType == 0) return;
+            // IDK how to get length of packaget, so i ignore it
+            int size = 896;
+            byte[] bytes = new byte[896];
+            try
+            {
+                Marshal.Copy(dataPtr, bytes, 0, size);
+            }
+            catch (Exception e)
+            {
+                PluginLog.LogError(e.Message);
+            }
+#if DEBUG
+            var corretOpcode = 0x0396;
+            if (corretOpcode == opCode)
+            {
+                PluginLog.Log("opcode is correct" + bytes.Length);
+            }
+#endif
+            //if (bytes.Length != 896) return;
+            if (bytes[13-1] != 1) return;
+            var playerName = ClientState.LocalPlayer.Name.ToString();
+            if (!IncludesBytes(bytes, System.Text.Encoding.UTF8.GetBytes(playerName))) return;
+            
+            var gameVersiontext = DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
+            Configuration.GameVersion = gameVersiontext;
+            Configuration.SocialListOpcode = opCode;
+            Configuration.Save();
+            this.detectOpcode = false;
+            Chat.Print(string.Format(this.loc.Localize("Opcode detected\n Game version: {0}\nOpcode: {1}"), gameVersiontext, opCode));
         }
 
         private unsafe void GetDataFromNetwork(byte[] data)
