@@ -22,9 +22,16 @@ Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname
 
 Use '/pname config' show plugin's setting
 
+# Know Issue
+- [ ] 自动检测Opcode可能会检查到错误的Opcode，我不知道怎么获取网络包的长度 Renew Opcode may detect the wrong Opcode, I don't know how to get the length of the network packet
+
 # TODO
 - [x] GUI能游戏内添加/记录昵称
-- [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友。（新人频道的指导者和新人）
+- [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友。（新人频道的指导者和新人）Support everywhere with ContentID
+  - [x] 好友列表 FriendList
+  - [x] 小队列表 PartyList
+  - [x] 玩家搜索 PlayerSearch
+  - [ ] 新人频道（指导者 & 新人/回归者）Novice Network(Mentor & New Adventurer/Returner)
 - [ ] 黑名单支持 Support Blacklist
 - [ ] 区分`找不到该角色`和普通跨服好友 Distinguish `Unable to Retrieve` with noral cross world friend
 
