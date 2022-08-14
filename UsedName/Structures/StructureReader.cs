@@ -59,7 +59,7 @@ namespace UsedName.Structures
             {
                 case StructureType.SocialList:
 #if DEBUG
-                    PluginLog.Log($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.type}");
+                    PluginLog.LogDebug($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.type}");
                     PluginLog.LogDebug($"At padding {socialList.padding}, {socialList.padding1}, {socialList.padding2},{socialList.padding3}");
 #endif
                     // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
@@ -72,7 +72,7 @@ namespace UsedName.Structures
                         {
 #if DEBUG
                             // entry.bytes is only different part. it seems to consist of 3 parts. At the middle 4 bytes always 00-00-00-00
-                            PluginLog.Log($"name IsNullOrEmpty {entry.contentId}:{name}\n" +
+                            PluginLog.LogDebug($"name IsNullOrEmpty {entry.contentId}:{name}\n" +
                                 $"{BitConverter.ToString(entry.bytes)}");
 #endif
                             continue;

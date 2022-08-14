@@ -27,10 +27,13 @@ Use '/pname config' show plugin's setting
 
 # TODO
 - [x] GUI能游戏内添加/记录昵称
-- [ ] 给大部分能有ContentID的地方，支持功能，不局限于好友。（新人频道的指导者和新人）Support everywhere with ContentID
+- [ ] 给大部分能有ContentID的地方，支持功能。事实上，我觉得目前的应该够了。如果你想要，可以给我提个issue Support everywhere with ContentID. In fact, I think current support parts is enough. If you want, please write it in issue
   - [x] 好友列表 FriendList
   - [x] 小队列表 PartyList
   - [x] 玩家搜索 PlayerSearch
+  - [ ] 原始服务器在线成员 Members Online and on Home World
+  - [ ] 部队成员 Company Member
+  - [ ] 入队申请 Application of Company
   - [ ] 新人频道（指导者 & 新人/回归者）Novice Network(Mentor & New Adventurer/Returner)
 - [ ] 黑名单支持 Support Blacklist
 - [ ] 区分`找不到该角色`和普通跨服好友 Distinguish `Unable to Retrieve` with noral cross world friend

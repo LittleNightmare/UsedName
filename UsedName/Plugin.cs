@@ -299,11 +299,13 @@ namespace UsedName
         {
             IDictionary<ulong, string> currentPlayersList;
             currentPlayersList = Structures.StructureReader.Read(data, Structures.StructureReader.StructureType.SocialList);
-            // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????; 8 = New Adventurer/Returner; 9 = Mentor
+            // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
+            // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
+            // 8 = New Adventurer/Returner; 9 = Mentor
             var type = currentPlayersList.TryGetValue(0, out _) ? currentPlayersList[0] : "";
             currentPlayersList.Remove(0);
   
-            string[] knownType = { "1", "2", "4", "8", "9" };
+            string[] knownType = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             if (!knownType.Contains(type))
             {
 #if DEBUG
@@ -312,10 +314,12 @@ namespace UsedName
                 return;
             }
 
+            string[] acceptType = { "1", "2", "4" };
+
             if ((type == "1" && !this.Configuration.UpdateFromPartyList)||
                 (type == "2" && !this.Configuration.UpdateFromFriendList)||
                 (type == "4" && !this.Configuration.UpdateFromPlayerSearch)||
-                type == "8" || type == "9")
+                !acceptType.Contains(type))
             {
                 return;
             }
