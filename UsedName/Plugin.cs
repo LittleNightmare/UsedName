@@ -108,33 +108,33 @@ namespace UsedName
 
         }
 
-        public void UpdateOpcode()
-        {
-            //not need anymore
-            var lastOpcodeVersion = new GameVersion(Configuration.GameVersion);
-            if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
-            {
-                var lastestOpcodeVersionCN = new GameVersion("2022.07.22.0000.0000");
-                if (lastOpcodeVersion < lastestOpcodeVersionCN)
-                {
-                    // 6.1
-                    Configuration.SocialListOpcode = 0x0396;
-                    Configuration.GameVersion = lastestOpcodeVersionCN.ToString();
-                }
+        //public void UpdateOpcode()
+        //{
+        //    //not need anymore
+        //    var lastOpcodeVersion = new GameVersion(Configuration.GameVersion);
+        //    if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
+        //    {
+        //        var lastestOpcodeVersionCN = new GameVersion("2022.07.22.0000.0000");
+        //        if (lastOpcodeVersion < lastestOpcodeVersionCN)
+        //        {
+        //            // 6.1
+        //            Configuration.SocialListOpcode = 0x0396;
+        //            Configuration.GameVersion = lastestOpcodeVersionCN.ToString();
+        //        }
                 
-            }
-            else
-            {
-                var lastestOpcodeVersionGlobal = new GameVersion("2022.07.08.0000.0000");
-                if (lastOpcodeVersion < lastestOpcodeVersionGlobal)
-                {
-                    // waiting for someone find it, now is 6.15? i guess
-                    Configuration.SocialListOpcode = 0x0303;
-                    Configuration.GameVersion = lastestOpcodeVersionGlobal.ToString();
-                }
-            }
-            this.Configuration.Save();
-        }
+        //    }
+        //    else
+        //    {
+        //        var lastestOpcodeVersionGlobal = new GameVersion("2022.07.08.0000.0000");
+        //        if (lastOpcodeVersion < lastestOpcodeVersionGlobal)
+        //        {
+        //            // waiting for someone find it, now is 6.15? i guess
+        //            Configuration.SocialListOpcode = 0x0303;
+        //            Configuration.GameVersion = lastestOpcodeVersionGlobal.ToString();
+        //        }
+        //    }
+        //    this.Configuration.Save();
+        //}
 
         public void Dispose()
         {
