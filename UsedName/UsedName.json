@@ -4,6 +4,8 @@
   "Punchline": "A simple tool to record players' used names and nickname",
   "Description": "A simple tool to record players' used names and nickname, only supports FriendList currently. Right click on the target to add/check the used names and nickname.\n",
   "InternalName": "UsedName",
+  "AssemblyVersion": "0.7.5.1",
+  "DalamudApiLevel": 6,
   "RepoUrl": "https://github.com/LittleNightmare/UsedName",
   "ApplicableVersion": "any",
   "Tags": [
