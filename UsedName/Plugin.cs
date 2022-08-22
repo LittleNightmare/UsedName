@@ -76,11 +76,11 @@ namespace UsedName
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "Use '/pname' or '/pname update' to update data from FriendList\n" +
-                "Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n" +
-                "Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname', only support player from FriendList\n" +
-                "(Format require:first last nickname; first last nick name)\n" +
-                "Use '/pname config' show plugin's setting"
+                HelpMessage = loc.Localize("Use '/pname' or '/pname update' to update data from FriendList\n") +
+                loc.Localize("Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n") +
+                loc.Localize("Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n") +
+                loc.Localize("(Format require:first last nickname; first last nick name)\n") +
+                loc.Localize("Use '/pname config' show plugin's setting")
             }) ;
 
             // first time
