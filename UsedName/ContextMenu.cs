@@ -17,13 +17,13 @@ public class ContextMenu : IDisposable
 
     public void Enable()
     {
-        plugin.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
-        plugin.ContextMenu.OnOpenGameObjectContextMenu += OnOpenContextMenu;
+        Service.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
+        Service.ContextMenu.OnOpenGameObjectContextMenu += OnOpenContextMenu;
     }
 
     public void Disable()
     {
-        plugin.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
+        Service.ContextMenu.OnOpenGameObjectContextMenu -= OnOpenContextMenu;
     }
 
     public void Dispose()
@@ -61,14 +61,14 @@ public class ContextMenu : IDisposable
         if (!IsMenuValid(args))
             return;
         
-        if (plugin.Configuration.EnableSearchInContext)
+        if (Service.Configuration.EnableSearchInContext)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(plugin.Configuration.SearchString, Search));
+            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SearchString, Search));
         }
         
-        if (plugin.Configuration.EnableAddNickName)
+        if (Service.Configuration.EnableAddNickName)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(plugin.Configuration.AddNickNameString, AddNickName));
+            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.AddNickNameString, AddNickName));
         }
     }
 
@@ -78,7 +78,7 @@ public class ContextMenu : IDisposable
         {
             return;
         }
-        plugin.tempPlayerName = args.Text.ToString();
+        Service.TempPlayerName = args.Text.ToString();
         plugin.DrawMainUI();
     }
 
@@ -93,7 +93,7 @@ public class ContextMenu : IDisposable
         }
         else
         {
-            plugin.Chat.PrintError("Cannot find");
+            Service.Chat.PrintError("Cannot find");
         }
         
     }

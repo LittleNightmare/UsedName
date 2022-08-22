@@ -28,82 +28,58 @@ namespace UsedName
 
         private const string commandName = "/pname";
 
-        private XivCommonBase Common { get; }
-        internal ChatGui Chat { get; private set; }
-
-        internal DalamudContextMenu ContextMenu { get; private set; }
-        internal ContextMenu ContextMenuManager { get; private set; }
-
-        private DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
-        public Configuration Configuration { get; init; }
-        private PluginUI PluginUi { get; init; }
-        internal GameNetwork Network { get; init; }
-        internal ClientState ClientState { get; init; }
-        internal DataManager DataManager { get; init; }
         // interrupt between UI and ContextMenu
-        internal string tempPlayerName { get; set;  } = "";
-        internal Localization loc { get; set; }
-        internal bool detectOpcode { get; set; } = false;
+
+        internal bool DetectOpcode { get; set; } = false;
 
 
         public UsedName(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager,
-            GameNetwork network,
-            DataManager data,
-            ClientState clientState,
-            ChatGui chatGUI)
+            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
         {
-            this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
-            this.Network = network;
-            this.ClientState = clientState;
-            this.DataManager = data;
-            this.Chat = chatGUI;
-            this.ContextMenu = new DalamudContextMenu();
+            pluginInterface.Create<Service>();
+            Service.ContextMenu = new DalamudContextMenu();
 
-            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(this.PluginInterface);
+            Service.Configuration = Service.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Service.Configuration.Initialize();
 
-            this.Common = new XivCommonBase();
-            this.ContextMenuManager = new ContextMenu(this);
+            Service.Common = new XivCommonBase();
+            Service.ContextMenuManager = new ContextMenu(this);
 
-            this.loc = new Localization(this.Configuration.Language);
+            Service.Loc = new Localization(Service.Configuration.Language);
 
             // you might normally want to embed resources and load them from the manifest stream
-            this.PluginUi = new PluginUI(this);
-
-            this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
+            Service.PluginUi = new PluginUI(this);
+            
+            Service.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = loc.Localize("Use '/pname' or '/pname update' to update data from FriendList\n") +
-                loc.Localize("Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n") +
-                loc.Localize("Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n") +
-                loc.Localize("(Format require:first last nickname; first last nick name)\n") +
-                loc.Localize("Use '/pname config' show plugin's setting")
+                HelpMessage = Service.Loc.Localize("Use '/pname' or '/pname update' to update data from FriendList\n") +
+                Service.Loc.Localize("Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n") +
+                Service.Loc.Localize("Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n") +
+                Service.Loc.Localize("(Format require:first last nickname; first last nick name)\n") +
+                Service.Loc.Localize("Use '/pname config' show plugin's setting")
             }) ;
 
             // first time
-            if (this.Configuration.playersNameList.Count <= 0)
+            if (Service.Configuration.playersNameList.Count <= 0)
             {
                 this.GetDataFromMemory();
             }
 
-            if (this.Configuration.SocialListOpcode == 0)
+            if (Service.Configuration.SocialListOpcode == 0)
             {
-                this.detectOpcode = true;
+                this.DetectOpcode = true;
                 //this.UpdateOpcode();
             }
-            var gameVersiontext = DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
-            if (new GameVersion(Configuration.GameVersion) < new GameVersion(gameVersiontext)&&Configuration.AutoCheckOpcodeUpdate)
+            var gameVersiontext = Service.DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
+            if (new GameVersion(Service.Configuration.GameVersion) < new GameVersion(gameVersiontext)&& Service.Configuration.AutoCheckOpcodeUpdate)
             {
-                this.detectOpcode = true;
+                this.DetectOpcode = true;
             }
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            this.Network.NetworkMessage += OnNetworkEventDetectOpcode;
-            this.Network.NetworkMessage += OnNetworkEvent;
+            Service.PluginInterface.UiBuilder.Draw += DrawUI;
+            Service.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            Service.Network.NetworkMessage += OnNetworkEventDetectOpcode;
+            Service.Network.NetworkMessage += OnNetworkEvent;
 
 
         }
@@ -138,17 +114,17 @@ namespace UsedName
 
         public void Dispose()
         {
-            this.PluginInterface.UiBuilder.Draw -= DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
-            this.PluginUi.Dispose();
-            this.Network.NetworkMessage -= OnNetworkEventDetectOpcode;
-            this.Network.NetworkMessage -= OnNetworkEvent;
-            this.CommandManager.RemoveHandler(commandName);
-            this.Common.Dispose();
-            this.ContextMenuManager.Dispose();
-            this.ContextMenu.Dispose();
+            Service.PluginInterface.UiBuilder.Draw -= DrawUI;
+            Service.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
+            Service.PluginUi.Dispose();
+            Service.Network.NetworkMessage -= OnNetworkEventDetectOpcode;
+            Service.Network.NetworkMessage -= OnNetworkEvent;
+            Service.CommandManager.RemoveHandler(commandName);
+            Service.Common.Dispose();
+            Service.ContextMenuManager.Dispose();
+            Service.ContextMenu.Dispose();
 #if DEBUG
-            this.loc.StoreLanguage();
+            Service.Loc.StoreLanguage();
 #endif
             GC.SuppressFinalize(this);
         }
@@ -173,7 +149,7 @@ namespace UsedName
                 }
                 else
                 {
-                    Chat.PrintError(string.Format(this.loc.Localize("Parameter error, length is '{0}'"),temp.Length));
+                    Service.Chat.PrintError(string.Format(Service.Loc.Localize("Parameter error, length is '{0}'"),temp.Length));
                     return;
                 }
                 this.SearchPlayerResult(targetName);
@@ -191,34 +167,34 @@ namespace UsedName
                 this.DrawConfigUI();
             }
             else
-            {               
-                Chat.PrintError(this.loc.Localize($"Invalid parameter: ")+args);
+            {
+                Service.Chat.PrintError(Service.Loc.Localize($"Invalid parameter: ")+args);
             }
         }
 
 
         private void DrawUI()
         {
-            this.PluginUi.Draw();
+            Service.PluginUi.Draw();
         }
 
         internal void DrawMainUI()
         {
-            this.PluginUi.Visible = true;
+            Service.PluginUi.Visible = true;
         }
         private void DrawConfigUI()
         {
-            this.PluginUi.SettingsVisible = true;
+            Service.PluginUi.SettingsVisible = true;
         }
         
         private void OnNetworkEvent(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
         {
-            if (!this.Configuration.EnableAutoUpdate) return;
-            if (this.detectOpcode) return;
-            if (!this.ClientState.IsLoggedIn) return;
+            if (!Service.Configuration.EnableAutoUpdate) return;
+            if (this.DetectOpcode) return;
+            if (!Service.ClientState.IsLoggedIn) return;
             if (direction != NetworkMessageDirection.ZoneDown) return;
-            if (this.ClientState.LocalPlayer == null || this.ClientState.TerritoryType == 0) return;
-            if (opCode != this.Configuration.SocialListOpcode) return;
+            if (Service.ClientState.LocalPlayer == null || Service.ClientState.TerritoryType == 0) return;
+            if (opCode != Service.Configuration.SocialListOpcode) return;
 
             int size = Marshal.SizeOf(typeof(Structures.SocialList));
             try
@@ -260,10 +236,10 @@ namespace UsedName
 
         public void OnNetworkEventDetectOpcode(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
         {
-            if (!this.detectOpcode) return;
-            if (!this.ClientState.IsLoggedIn) return;
+            if (!this.DetectOpcode) return;
+            if (!Service.ClientState.IsLoggedIn) return;
             if (direction != NetworkMessageDirection.ZoneDown) return;
-            if (this.ClientState.LocalPlayer == null || this.ClientState.TerritoryType == 0) return;
+            if (Service.ClientState.LocalPlayer == null || Service.ClientState.TerritoryType == 0) return;
             // IDK how to get length of packaget, so i ignore it
             int size = 896;
             byte[] bytes = new byte[896];
@@ -284,15 +260,15 @@ namespace UsedName
 #endif
             //if (bytes.Length != 896) return;
             if (bytes[13-1] != 1) return;
-            var playerName = ClientState.LocalPlayer.Name.ToString();
+            var playerName = Service.ClientState.LocalPlayer.Name.ToString();
             if (!IncludesBytes(bytes, System.Text.Encoding.UTF8.GetBytes(playerName))) return;
             
-            var gameVersiontext = DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
-            Configuration.GameVersion = gameVersiontext;
-            Configuration.SocialListOpcode = opCode;
-            Configuration.Save();
-            this.detectOpcode = false;
-            Chat.Print(string.Format(this.loc.Localize("Opcode detected\n Game version: {0}\nOpcode: {1}"), gameVersiontext, opCode));
+            var gameVersiontext = Service.DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
+            Service.Configuration.GameVersion = gameVersiontext;
+            Service.Configuration.SocialListOpcode = opCode;
+            Service.Configuration.Save();
+            this.DetectOpcode = false;
+            Service.Chat.Print(string.Format(Service.Loc.Localize("Opcode detected\n Game version: {0}\nOpcode: {1}"), gameVersiontext, opCode));
         }
 
         private unsafe void GetDataFromNetwork(byte[] data)
@@ -309,34 +285,34 @@ namespace UsedName
             if (!knownType.Contains(type))
             {
 #if DEBUG
-                Chat.Print($"UsedName: Find Unknown type: {type}");
+                Service.Chat.Print($"UsedName: Find Unknown type: {type}");
 #endif
                 return;
             }
 
             string[] acceptType = { "1", "2", "4" };
 
-            if ((type == "1" && !this.Configuration.UpdateFromPartyList)||
-                (type == "2" && !this.Configuration.UpdateFromFriendList)||
-                (type == "4" && !this.Configuration.UpdateFromPlayerSearch)||
+            if ((type == "1" && !Service.Configuration.UpdateFromPartyList)||
+                (type == "2" && !Service.Configuration.UpdateFromFriendList)||
+                (type == "4" && !Service.Configuration.UpdateFromPlayerSearch)||
                 !acceptType.Contains(type))
             {
                 return;
             }
             // party list includes the player hiself, remove it
-            currentPlayersList.Remove(this.ClientState.LocalContentId);
+            currentPlayersList.Remove(Service.ClientState.LocalContentId);
 #if DEBUG
             foreach (var player in currentPlayersList)
             {
-                PluginLog.Debug($"{player.Key}:{player.Value}:{this.Configuration.playersNameList.ContainsKey(player.Key)}");
+                PluginLog.Debug($"{player.Key}:{player.Value}:{Service.Configuration.playersNameList.ContainsKey(player.Key)}");
             }
 #endif
             this.UpdatePlayerNames(currentPlayersList, showHint: false);
         }
-
+        
         internal void GetDataFromMemory()
         {
-            var friendList = Common.Functions.FriendList.List.GetEnumerator();
+            var friendList = Service.Common.Functions.FriendList.List.GetEnumerator();
             IDictionary<ulong, string> currentPlayersList = new Dictionary<ulong, string>();
             while (friendList.MoveNext())
             {
@@ -350,7 +326,7 @@ namespace UsedName
 
         internal void UpdatePlayerNames(IDictionary<ulong, string> currentPlayersList, bool showHint=true)
         {
-            var savedFriendList = this.Configuration.playersNameList;
+            var savedFriendList = Service.Configuration.playersNameList;
             foreach (var player in currentPlayersList)
             {
                 var contentId = player.Key;
@@ -359,10 +335,10 @@ namespace UsedName
                 {
                     if (!savedFriendList[contentId].currentName.Equals(name))
                     {
-                        if (Configuration.ShowNameChange)
+                        if (Service.Configuration.ShowNameChange)
                         {
                             var temp = string.IsNullOrEmpty(savedFriendList[contentId].nickName) ? savedFriendList[contentId].currentName : $"({savedFriendList[contentId].nickName})";
-                            Chat.Print(temp + this.loc.Localize($" changed name to ") + $"{name}");
+                            Service.Chat.Print(temp + Service.Loc.Localize($" changed name to ") + $"{name}");
                         }
                         savedFriendList[contentId].usedNames.Add(savedFriendList[contentId].currentName);
                         savedFriendList[contentId].currentName = name;
@@ -374,11 +350,11 @@ namespace UsedName
                 }
 
             }
-            this.Configuration.playersNameList = savedFriendList;
-            this.Configuration.Save();
+            Service.Configuration.playersNameList = savedFriendList;
+            Service.Configuration.Save();
             if (showHint)
             {
-                Chat.Print(this.loc.Localize("Update FriendList completed"));
+                Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
             }
             
         }
@@ -387,7 +363,7 @@ namespace UsedName
         {
             var result = new Dictionary<ulong, Configuration.PlayersNames>();
             targetName = targetName.ToLower();
-            foreach (var player in this.Configuration.playersNameList)
+            foreach (var player in Service.Configuration.playersNameList)
             {
                 var current = player.Value.currentName.ToLower();
                 var nickNmae = player.Value.nickName.ToLower();
@@ -407,13 +383,13 @@ namespace UsedName
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
                 result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
             }
-            Chat.Print(string.Format(this.loc.Localize("Search result(s) for target [{0}]:"), targetName)+$"\n{result}");
+            Service.Chat.Print(string.Format(Service.Loc.Localize("Search result(s) for target [{0}]:"), targetName)+$"\n{result}");
             return result;
         }
         
         public XivCommon.Functions.FriendList.FriendListEntry GetPlayerByNameFromFriendList(string name)
         {
-            var friendList = Common.Functions.FriendList.List.GetEnumerator();
+            var friendList = Service.Common.Functions.FriendList.List.GetEnumerator();
             while (friendList.MoveNext())
             {
                 var player = friendList.Current;
@@ -430,17 +406,17 @@ namespace UsedName
             var player = SearchPlayer(playerName);
             if (player.Count == 0)
             {
-                Chat.PrintError(string.Format(this.loc.Localize("Cannot find player '{0}', Please try using '/pname update' to update FriendList, or check the spelling"), playerName));
+                Service.Chat.PrintError(string.Format(Service.Loc.Localize("Cannot find player '{0}', Please try using '/pname update' to update FriendList, or check the spelling"), playerName));
                 return;
             }
             if (player.Count > 1)
             {
-                Chat.PrintError(string.Format(this.loc.Localize("Find multiple '{0}', please search for players using the exact name"), playerName));
+                Service.Chat.PrintError(string.Format(Service.Loc.Localize("Find multiple '{0}', please search for players using the exact name"), playerName));
                 return;
             }
-            this.Configuration.playersNameList[player.First().Key].nickName = nickName;
-            this.Configuration.Save();
-            Chat.Print(string.Format(this.loc.Localize("The nickname of {0} has been set to {1}"), playerName, nickName));
+            Service.Configuration.playersNameList[player.First().Key].nickName = nickName;
+            Service.Configuration.Save();
+            Service.Chat.Print(string.Format(Service.Loc.Localize("The nickname of {0} has been set to {1}"), playerName, nickName));
         }
         // name from command, try to solve "Palyer Name nick name", "Palyer Name nickname", not support "PalyerName nick name"
         public string[] ParseNameText(string text)

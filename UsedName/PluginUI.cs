@@ -8,7 +8,6 @@ namespace UsedName
     // to do any cleanup
     class PluginUI : IDisposable
     {
-        private Configuration configuration;
         private readonly UsedName plugin;
 
         // this extra bool exists for ImGui, since you can't ref a property
@@ -30,7 +29,6 @@ namespace UsedName
         public PluginUI(UsedName Plugin)
         {
             this.plugin = Plugin;
-            this.configuration = plugin.Configuration;
         }
         
         public void Dispose()
@@ -60,27 +58,27 @@ namespace UsedName
 
             ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin(this.plugin.loc.Localize("Used Name: Add nick name"), ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.Begin(Service.Loc.Localize("Used Name: Add nick name"), ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text(this.plugin.tempPlayerName + this.plugin.loc.Localize("'s current nick name:"));
-                var target = this.plugin.GetPlayerByNameFromFriendList(this.plugin.tempPlayerName);
-                if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry())||! this.configuration.playersNameList.TryGetValue(target.ContentId, out _))
+                ImGui.Text(Service.TempPlayerName + Service.Loc.Localize("'s current nick name:"));
+                var target = this.plugin.GetPlayerByNameFromFriendList(Service.TempPlayerName);
+                if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry())||!Service.Configuration.playersNameList.TryGetValue(target.ContentId, out _))
                 {
-                    ImGui.Text(String.Format(this.plugin.loc.Localize("NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList"), this.plugin.tempPlayerName));
+                    ImGui.Text(String.Format(Service.Loc.Localize("NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList"), Service.TempPlayerName));
                     ImGui.Spacing();
-                    if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
+                    if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
                     {
                         this.plugin.GetDataFromMemory();
                     }
                 }
                 else
                 {
-                    var nickName = this.configuration.playersNameList[target.ContentId].nickName;
+                    var nickName = Service.Configuration.playersNameList[target.ContentId].nickName;
                     // var nickName = target.nickName;
                     if (ImGui.InputText("##CurrentNickName", ref nickName, 15))
                     {
-                        this.configuration.playersNameList[target.ContentId].nickName = nickName;
-                        this.configuration.Save();
+                        Service.Configuration.playersNameList[target.ContentId].nickName = nickName;
+                        Service.Configuration.Save();
                     }
                 }
 
@@ -98,116 +96,116 @@ namespace UsedName
             ImGui.SetNextWindowSize(new Vector2(550, 410), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Used Name Settings", ref this.settingsVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                if (ImGui.Button(this.plugin.loc.Localize("Update FriendList")))
+                if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
                 {
                     this.plugin.GetDataFromMemory();
                 }
                 ImGui.Spacing();
-                ImGui.Text(this.plugin.loc.Localize("Language:"));
+                ImGui.Text(Service.Loc.Localize("Language:"));
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(200);
-                if (ImGui.BeginCombo("##Language", this.configuration.Language))
+                if (ImGui.BeginCombo("##Language", Service.Configuration.Language))
                 {
-                    foreach (var lang in this.plugin.loc.GetLanguages())
+                    foreach (var lang in Service.Loc.GetLanguages())
                     {
                         if (ImGui.Selectable(lang.ToString()))
                         {
-                            this.configuration.Language = lang;
-                            this.configuration.Save();
-                            this.plugin.loc.currentLanguage = lang;
+                            Service.Configuration.Language = lang;
+                            Service.Configuration.Save();
+                            Service.Loc.currentLanguage = lang;
                         }
                     }
                     ImGui.EndCombo();
                 }
 
                 // checkbox EnableAutoUpdate
-                if(ImGui.Checkbox(this.plugin.loc.Localize("Enable Auto Update"), ref this.configuration.EnableAutoUpdate))
+                if(ImGui.Checkbox(Service.Loc.Localize("Enable Auto Update"), ref Service.Configuration.EnableAutoUpdate))
                 {
-                    this.configuration.Save();
+                    Service.Configuration.Save();
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(this.plugin.loc.Localize("Automatically update player name when opening FriendList"));
+                    ImGui.SetTooltip(Service.Loc.Localize("Automatically update player name when opening FriendList"));
                 }
-                if (this.configuration.EnableAutoUpdate)
+                if (Service.Configuration.EnableAutoUpdate)
                 {
                     ImGui.Spacing();
                     ImGui.Indent();
-                    if (ImGui.Checkbox(this.plugin.loc.Localize("Update From PartyList"), ref this.configuration.UpdateFromPartyList))
+                    if (ImGui.Checkbox(Service.Loc.Localize("Update From PartyList"), ref Service.Configuration.UpdateFromPartyList))
                     {
-                        this.configuration.Save();
+                        Service.Configuration.Save();
                     }
-                    if (ImGui.Checkbox(this.plugin.loc.Localize("Update From FriendList"), ref this.configuration.UpdateFromFriendList))
+                    if (ImGui.Checkbox(Service.Loc.Localize("Update From FriendList"), ref Service.Configuration.UpdateFromFriendList))
                     {
-                        this.configuration.Save();
+                        Service.Configuration.Save();
                     }
-                    if (ImGui.Checkbox(this.plugin.loc.Localize("Update From PlayerSearch"), ref this.configuration.UpdateFromPlayerSearch))
+                    if (ImGui.Checkbox(Service.Loc.Localize("Update From PlayerSearch"), ref Service.Configuration.UpdateFromPlayerSearch))
                     {
-                        this.configuration.Save();
+                        Service.Configuration.Save();
                     }
                     ImGui.Unindent();
                 }
 
-                if (ImGui.Checkbox(this.plugin.loc.Localize("Name Change Check"), ref this.configuration.ShowNameChange))
+                if (ImGui.Checkbox(Service.Loc.Localize("Name Change Check"), ref Service.Configuration.ShowNameChange))
                 {
-                    this.configuration.Save();
+                    Service.Configuration.Save();
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(this.plugin.loc.Localize("Show palyer who changed name when update FriendList"));
+                    ImGui.SetTooltip(Service.Loc.Localize("Show palyer who changed name when update FriendList"));
                 }
-                if (ImGui.Checkbox(this.plugin.loc.Localize("Enable Search In Context"), ref this.configuration.EnableSearchInContext))
+                if (ImGui.Checkbox(Service.Loc.Localize("Enable Search In Context"), ref Service.Configuration.EnableSearchInContext))
                 {
-                    this.configuration.Save();
+                    Service.Configuration.Save();
                 }
 
-                if (this.configuration.EnableSearchInContext)
+                if (Service.Configuration.EnableSearchInContext)
                 {
                     ImGui.Spacing();
                     ImGui.Indent();
-                    ImGui.TextUnformatted(this.plugin.loc.Localize("Search in Context String"));
+                    ImGui.TextUnformatted(Service.Loc.Localize("Search in Context String"));
                     ImGui.SameLine();
-                    if (ImGui.InputText("##SearchInContextString", ref this.configuration.SearchString, 15))
+                    if (ImGui.InputText("##SearchInContextString", ref Service.Configuration.SearchString, 15))
                     {
-                        this.configuration.Save();
+                        Service.Configuration.Save();
                     }
                     ImGui.Unindent();
 
                 }
-                if (ImGui.Checkbox(this.plugin.loc.Localize("Enable Add Nick Name"), ref this.configuration.EnableAddNickName))
+                if (ImGui.Checkbox(Service.Loc.Localize("Enable Add Nick Name"), ref Service.Configuration.EnableAddNickName))
                 {
-                    this.configuration.Save();
+                    Service.Configuration.Save();
                 }
-                if (this.configuration.EnableAddNickName)
+                if (Service.Configuration.EnableAddNickName)
                 {
                     ImGui.Spacing();
                     ImGui.Indent();
-                    ImGui.TextUnformatted(this.plugin.loc.Localize("Add Nick Name String"));
+                    ImGui.TextUnformatted(Service.Loc.Localize("Add Nick Name String"));
                     ImGui.SameLine();
-                    if (ImGui.InputText("##AddNickNameString", ref this.configuration.AddNickNameString, 15))
+                    if (ImGui.InputText("##AddNickNameString", ref Service.Configuration.AddNickNameString, 15))
                     {
-                        this.configuration.Save();
+                        Service.Configuration.Save();
                     }
                     ImGui.Unindent();
                 }
                 ImGui.Spacing();
-                if (ImGui.Checkbox(this.plugin.loc.Localize("Auto Renew Opcode"), ref this.configuration.AutoCheckOpcodeUpdate))
+                if (ImGui.Checkbox(Service.Loc.Localize("Auto Renew Opcode"), ref Service.Configuration.AutoCheckOpcodeUpdate))
                 {
-                    this.configuration.Save();
+                    Service.Configuration.Save();
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(this.plugin.loc.Localize("Auto renew Opcode after game update, please open PartyList to renew Opcode") +
-                        this.plugin.loc.Localize("\nIf you find that the plugin cannot update the player information automatically, it may be that the detected opcode is wrong. Please click Renew Opcode to solve it"));
+                    ImGui.SetTooltip(Service.Loc.Localize("Auto renew Opcode after game update, please open PartyList to renew Opcode") +
+                        Service.Loc.Localize("\nIf you find that the plugin cannot update the player information automatically, it may be that the detected opcode is wrong. Please click Renew Opcode to solve it"));
                 }
                 ImGui.SameLine();
-                if (ImGui.Button(this.plugin.loc.Localize("Renew Opcode")))
+                if (ImGui.Button(Service.Loc.Localize("Renew Opcode")))
                 {
-                    this.plugin.detectOpcode = true;
+                    this.plugin.DetectOpcode = true;
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(this.plugin.loc.Localize("Manually renew for Opcode updates, please open PartyList after click button immediately to renew Opcode"));
+                    ImGui.SetTooltip(Service.Loc.Localize("Manually renew for Opcode updates, please open PartyList after click button immediately to renew Opcode"));
                 }
                 ImGui.End();
             }

@@ -50,17 +50,13 @@ namespace UsedName
 
         // the below exist just to make saving less cumbersome
 
-        [NonSerialized]
-        private DalamudPluginInterface? pluginInterface;
-
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public void Initialize()
         {
-            this.pluginInterface = pluginInterface;
         }
 
         public void Save()
         {
-            this.pluginInterface!.SavePluginConfig(this);
+            Service.PluginInterface!.SavePluginConfig(this);
         }
     }
 }
