@@ -63,12 +63,12 @@ public class ContextMenu : IDisposable
         
         if (Service.Configuration.EnableSearchInContext)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SearchString, Search));
+            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SearchString, Search, true));
         }
         
         if (Service.Configuration.EnableAddNickName)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.AddNickNameString, AddNickName));
+            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.AddNickNameString, AddNickName, true));
         }
     }
 
