@@ -7,8 +7,8 @@ namespace UsedName
 {
     class Localization
     {
-        public string currentLanguage = "en";
-        private Dictionary<string, string> languageDict = new Dictionary<string, string> { };
+        internal string currentLanguage = "en";
+        private Dictionary<string, string> languageDict = new() { };
         public Localization(string language = "en")
         {
             currentLanguage = language;
@@ -27,11 +27,11 @@ namespace UsedName
 #endif
             return message;
         }
-        private void LoadLanguage(string language = "en")
+        internal void LoadLanguage(string language = "en")
         {
+            this.currentLanguage = language;
             if (language == "en") return;
             Translations.Culture = new System.Globalization.CultureInfo(language);
-            this.currentLanguage = language;
             var str = language switch{
                 _ => Translations.zh_CN
             };

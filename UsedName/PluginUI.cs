@@ -106,13 +106,14 @@ namespace UsedName
                 ImGui.SetNextItemWidth(200);
                 if (ImGui.BeginCombo("##Language", Service.Configuration.Language))
                 {
-                    foreach (var lang in Service.Loc.GetLanguages())
+                    var languages = Service.Loc.GetLanguages();
+                    foreach (var lang in languages)
                     {
-                        if (ImGui.Selectable(lang.ToString()))
+                        if (ImGui.Selectable(lang, lang == Service.Configuration.Language))
                         {
                             Service.Configuration.Language = lang;
+                            Service.Loc.LoadLanguage(lang);
                             Service.Configuration.Save();
-                            Service.Loc.currentLanguage = lang;
                         }
                     }
                     ImGui.EndCombo();
