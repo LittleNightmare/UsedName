@@ -10,8 +10,8 @@ namespace UsedName
     public class Configuration : IPluginConfiguration
     {
         public int Version { get; set; } = 1;
-
-        public string Language = "en"; 
+        
+        public string? Language = null; 
 
         public bool ShowNameChange = true;
         

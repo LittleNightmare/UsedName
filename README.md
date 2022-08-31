@@ -37,6 +37,7 @@ Use '/pname config' show plugin's setting
   - [ ] 新人频道（指导者 & 新人/回归者）Novice Network(Mentor & New Adventurer/Returner)
 - [ ] 黑名单支持 Support Blacklist
 - [ ] 区分`找不到该角色`和普通跨服好友 Distinguish `Unable to Retrieve` with noral cross world friend
+- [ ] 好友列表显示昵称 Show nick name in FriendList
 
 # Thanks
 感谢FFLogsViewer各个分支的参考，还有zhouhuichen741从远路把我拽回来。

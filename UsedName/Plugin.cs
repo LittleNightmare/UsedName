@@ -45,6 +45,19 @@ namespace UsedName
             Service.Common = new XivCommonBase();
             Service.ContextMenuManager = new ContextMenu(this);
 
+            if (string.IsNullOrEmpty(Service.Configuration.Language))
+            {
+                Service.Configuration.Language = Service.ClientState.ClientLanguage switch
+                {
+                    ClientLanguage.English => "en",
+                    ClientLanguage.Japanese => "en",
+                    ClientLanguage.French => "en",
+                    ClientLanguage.German => "en",
+                    // ClientLanguage.ChineseSimplified only exist in CN ver of dalamud
+                    // ClientLanguage.ChineseSimplified => "zh_CN",
+                    _ => "zh_CN",
+                };
+            }
             Service.Loc = new Localization(Service.Configuration.Language);
 
             // you might normally want to embed resources and load them from the manifest stream
@@ -252,7 +265,8 @@ namespace UsedName
                 PluginLog.LogError(e.Message);
             }
 #if DEBUG
-            var corretOpcode = 0x0396;
+            // CN 6.11
+            var corretOpcode = 0x00FD;
             if (corretOpcode == opCode)
             {
                 PluginLog.Log("opcode is correct" + bytes.Length);
