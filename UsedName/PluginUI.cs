@@ -75,7 +75,7 @@ namespace UsedName
                 {
                     var nickName = Service.Configuration.playersNameList[target.ContentId].nickName;
                     // var nickName = target.nickName;
-                    if (ImGui.InputText("##CurrentNickName", ref nickName, 15))
+                    if (ImGui.InputText("##CurrentNickName", ref nickName, 250))
                     {
                         Service.Configuration.playersNameList[target.ContentId].nickName = nickName;
                         Service.Configuration.Save();
