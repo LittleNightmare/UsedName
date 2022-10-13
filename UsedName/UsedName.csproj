@@ -22,12 +22,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
     <PlatformTarget>x64</PlatformTarget>
     <DebugType>portable</DebugType>
     <RepositoryUrl></RepositoryUrl>
     <RepositoryType></RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+	<DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net5.0-windows'">
+	<DalamudLibPath>F:\ffxiv\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,11 +41,19 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+	
+  <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
+    <PackageReference Include="XivCommon" Version="6.0.2" />
+  </ItemGroup>
+	
+  <ItemGroup Condition="'$(TargetFramework)'=='net5.0-windows'">
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.1.1" />
+    <PackageReference Include="XivCommon" Version="5.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
     <PackageReference Include="DalamudPackager" Version="2.1.8" />
-    <PackageReference Include="XivCommon" Version="6.0.2" />
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
       <Private>false</Private>
