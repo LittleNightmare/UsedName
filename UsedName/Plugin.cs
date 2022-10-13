@@ -18,6 +18,9 @@ using System;
 using Dalamud.Logging;
 using System.Runtime.InteropServices;
 using Dalamud.Data;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using UsedName.Structures;
+using Lumina.Excel.GeneratedSheets;
 
 namespace UsedName
 {
@@ -136,6 +139,7 @@ namespace UsedName
             Service.Common.Dispose();
             Service.ContextMenuManager.Dispose();
             Service.ContextMenu.Dispose();
+            Service.Configuration.Save();
 #if DEBUG
             Service.Loc.StoreLanguage();
 #endif
@@ -277,6 +281,19 @@ namespace UsedName
             var playerName = Service.ClientState.LocalPlayer.Name.ToString();
             if (!IncludesBytes(bytes, System.Text.Encoding.UTF8.GetBytes(playerName))) return;
             
+            try
+            {
+                var temp = Structures.StructureReader.Read(bytes, Structures.StructureReader.StructureType.SocialList);
+                if (temp[0] != "1") return;
+                if (!temp.TryGetValue(Service.ClientState.LocalContentId,out var tempname)) return;
+                if (!tempname.Equals(playerName)) return;
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            
+           
             var gameVersiontext = Service.DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
             Service.Configuration.GameVersion = gameVersiontext;
             Service.Configuration.SocialListOpcode = opCode;
@@ -333,7 +350,18 @@ namespace UsedName
                 var player = friendList.Current;
                 var contentId = player.ContentId;
                 var name = player.Name.ToString();
-                currentPlayersList.Add(contentId, name);
+                try
+                {
+                    currentPlayersList.Add(contentId, name);
+                }
+                catch (ArgumentException e)
+                {
+                    PluginLog.Warning($"{e}");
+                    PluginLog.Warning($"Unknown problem at {name}-{contentId}");
+                    PluginLog.Warning($"{friendList.ToString()}");
+                    return;
+                }
+                
             }
             UpdatePlayerNames(currentPlayersList);
         }
@@ -364,12 +392,16 @@ namespace UsedName
                 }
 
             }
-            Service.Configuration.playersNameList = savedFriendList;
-            Service.Configuration.Save();
-            if (showHint)
+            if (!Service.Configuration.playersNameList.Equals(savedFriendList))
             {
-                Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
+                Service.Configuration.playersNameList = savedFriendList;
+                Service.Configuration.Save();
+                if (showHint)
+                {
+                    Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
+                }
             }
+            
             
         }
 
