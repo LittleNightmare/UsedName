@@ -1,8 +1,11 @@
 ﻿using Dalamud.Configuration;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 
 namespace UsedName
 {
@@ -44,19 +47,55 @@ namespace UsedName
             }            
 
         }
-
+        [JsonIgnore]
         public IDictionary<ulong, PlayersNames> playersNameList = new Dictionary<ulong, PlayersNames>();
+        // Separate data and setting
+        [JsonProperty("playersNameList")]
+        private IDictionary<ulong, PlayersNames> playersNameListTemp
+        {
+            // get is intentionally omitted here
+            set { playersNameList = value; }
+        }
+
+        public string storeNamesPath = String.Empty;
 
 
         // the below exist just to make saving less cumbersome
 
         public void Initialize()
         {
+
+            if (String.IsNullOrEmpty(storeNamesPath))
+            {
+                var path = Service.PluginInterface.ConfigDirectory;
+                path.Create();
+                storeNamesPath = Path.Join(path.FullName, "storeNames.json");
+            }
+
+            if (File.Exists(storeNamesPath))
+            {
+                using (StreamReader r = new StreamReader(storeNamesPath))
+                {
+                    string json = r.ReadToEnd();
+                    playersNameList = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
+                }
+            }
+
         }
 
         public void Save()
         {
+            storeNames();
             Service.PluginInterface!.SavePluginConfig(this);
+        }
+
+        public void storeNames()
+        {
+            string jsonString = System.Text.Json.JsonSerializer.Serialize(playersNameList, new JsonSerializerOptions() { WriteIndented = true });
+            using (StreamWriter outputFile = new StreamWriter(storeNamesPath))
+            {
+                outputFile.WriteLine(jsonString);
+            }
         }
     }
 }
