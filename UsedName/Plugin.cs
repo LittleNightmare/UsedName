@@ -369,6 +369,8 @@ namespace UsedName
         internal void UpdatePlayerNames(IDictionary<ulong, string> currentPlayersList, bool showHint=true)
         {
             var savedFriendList = Service.Configuration.playersNameList;
+            bool same = true;
+
             foreach (var player in currentPlayersList)
             {
                 var contentId = player.Key;
@@ -377,6 +379,7 @@ namespace UsedName
                 {
                     if (!savedFriendList[contentId].currentName.Equals(name))
                     {
+                        same = false;
                         if (Service.Configuration.ShowNameChange)
                         {
                             var temp = string.IsNullOrEmpty(savedFriendList[contentId].nickName) ? savedFriendList[contentId].currentName : $"({savedFriendList[contentId].nickName})";
@@ -388,11 +391,12 @@ namespace UsedName
                 }
                 else
                 {
+                    same = false;
                     savedFriendList.Add(contentId, new Configuration.PlayersNames(name, "", new List<string> { }));
                 }
 
             }
-            if (!Service.Configuration.playersNameList.Equals(savedFriendList))
+            if (!same)
             {
                 Service.Configuration.playersNameList = savedFriendList;
                 Service.Configuration.storeNames();
