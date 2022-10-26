@@ -396,13 +396,11 @@ namespace UsedName
             {
                 Service.Configuration.playersNameList = savedFriendList;
                 Service.Configuration.storeNames();
-                if (showHint)
-                {
-                    Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
-                }
             }
-            
-            
+            if (showHint)
+            {
+                Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
+            }
         }
 
         public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName=false)
