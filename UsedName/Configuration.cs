@@ -13,16 +13,16 @@ namespace UsedName
     public class Configuration : IPluginConfiguration
     {
         public int Version { get; set; } = 1;
-        
-        public string? Language = null; 
+
+        public string? Language = null;
 
         public bool ShowNameChange = true;
-        
+
         public bool EnableSearchInContext = false;
         public string SearchString = "Search Used Name";
-        
+
         public bool EnableAddNickName = true;
-        public string AddNickNameString  = "Add Nick Name";
+        public string AddNickNameString = "Add Nick Name";
 
         public bool EnableAutoUpdate = false;
         public bool UpdateFromPartyList = false;
@@ -44,7 +44,7 @@ namespace UsedName
                 this.nickName = NickName;
                 this.currentName = CurrentName;
                 this.usedNames = UsedNames;
-            }            
+            }
 
         }
         [JsonIgnore]
@@ -77,22 +77,29 @@ namespace UsedName
                 using (StreamReader r = new StreamReader(storeNamesPath))
                 {
                     string json = r.ReadToEnd();
-                    playersNameList = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
+                    if (playersNameList.Equals(new Dictionary<ulong, PlayersNames>()))
+                    {
+                        playersNameList = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
+
+                    }
                 }
             }
 
         }
 
-        public void Save()
+        public void Save(bool storeName = false)
         {
-            storeNames();
+            if (storeName)
+            {
+                storeNames();
+            }           
             Service.PluginInterface!.SavePluginConfig(this);
         }
 
         public void storeNames()
         {
             string jsonString = System.Text.Json.JsonSerializer.Serialize(playersNameList, new JsonSerializerOptions() { WriteIndented = true });
-            using (StreamWriter outputFile = new StreamWriter(storeNamesPath))
+            using (StreamWriter outputFile = new StreamWriter(storeNamesPath, false, System.Text.Encoding.UTF8))
             {
                 outputFile.WriteLine(jsonString);
             }

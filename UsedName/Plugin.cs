@@ -139,7 +139,7 @@ namespace UsedName
             Service.Common.Dispose();
             Service.ContextMenuManager.Dispose();
             Service.ContextMenu.Dispose();
-            Service.Configuration.Save();
+            Service.Configuration.Save(storeName:true);
 #if DEBUG
             Service.Loc.StoreLanguage();
 #endif
@@ -395,7 +395,7 @@ namespace UsedName
             if (!Service.Configuration.playersNameList.Equals(savedFriendList))
             {
                 Service.Configuration.playersNameList = savedFriendList;
-                Service.Configuration.Save();
+                Service.Configuration.storeNames();
                 if (showHint)
                 {
                     Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
@@ -461,7 +461,7 @@ namespace UsedName
                 return;
             }
             Service.Configuration.playersNameList[player.First().Key].nickName = nickName;
-            Service.Configuration.Save();
+            Service.Configuration.storeNames();
             Service.Chat.Print(string.Format(Service.Loc.Localize("The nickname of {0} has been set to {1}"), playerName, nickName));
         }
         // name from command, try to solve "Palyer Name nick name", "Palyer Name nickname", not support "PalyerName nick name"
