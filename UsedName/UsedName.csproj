@@ -7,7 +7,7 @@
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;Debug-CN;Release-CN</Configurations>
 	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
@@ -29,10 +29,10 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+  <PropertyGroup Condition="!$(Configuration.EndsWith(CN))">
 	<DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='net5.0-windows'">
+  <PropertyGroup Condition="'$(Configuration.EndsWith(`CN`))'">
 	<DalamudLibPath>F:\ffxiv\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
 
@@ -54,14 +54,14 @@
     </Content>
   </ItemGroup>
 	
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+  <ItemGroup Condition="!$(Configuration.EndsWith(CN))">
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
     <PackageReference Include="XivCommon" Version="6.0.2" />
   </ItemGroup>
 	
-  <ItemGroup Condition="'$(TargetFramework)'=='net5.0-windows'">
-    <PackageReference Include="Dalamud.ContextMenu" Version="1.1.1" />
-    <PackageReference Include="XivCommon" Version="5.0.0" />
+  <ItemGroup Condition="$(Configuration.EndsWith(CN))">
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.2.0" />
+    <PackageReference Include="XivCommon" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
