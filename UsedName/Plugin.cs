@@ -358,7 +358,7 @@ namespace UsedName
                 {
                     PluginLog.Warning($"{e}");
                     PluginLog.Warning($"Unknown problem at {name}-{contentId}");
-                    PluginLog.Warning($"{friendList.ToString()}");
+                    Service.Chat.PrintError(Service.Loc.Localize($"Update Player List Fail\nMay cause by incompatible version of XivCommon\nPlease contact to developer"));
                     return;
                 }
                 

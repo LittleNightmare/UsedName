@@ -33,5 +33,6 @@
 	"Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n": "使用'/pname search 玩家'寻找玩家的曾用名。 我**建议**使用右键菜单，右键玩家搜索\n",
 	"Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n": "使用'/pname nick 玩家 昵称'设置'玩家'的昵称为昵称\n",
 	"(Format require:first last nickname; first last nick name)\n": "(格式要求: 玩家名字 昵称)\n",
-	"Use '/pname config' show plugin's setting": "使用'/pname config'打开插件设置"
+	"Use '/pname config' show plugin's setting": "使用'/pname config'打开插件设置",
+	"Update Player List Fail\nMay cause by incompatible version of XivCommon\nPlease contact to developer": "更新好友列表失败\n可能是由不兼容的XivCommon版本引起\n请联络开发人员"
 }
