@@ -59,9 +59,13 @@
     <PackageReference Include="XivCommon" Version="6.0.2" />
   </ItemGroup>
 	
-  <ItemGroup Condition="$(Configuration.EndsWith(CN))">
+  <ItemGroup Condition="$(Configuration.EndsWith(CN)) And $(TargetFramework)=='net6.0-windows'">
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.0" />
     <PackageReference Include="XivCommon" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="$(Configuration.EndsWith(CN)) And $(TargetFramework)=='net5.0-windows'">
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.1.1" />
+    <PackageReference Include="XivCommon" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -113,6 +117,14 @@
 
   <ItemGroup>
     <Folder Include="Resources\" />
+
   </ItemGroup>
+	<Target Name="PackagePlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Release-CN'">
+		<DalamudPackager
+                ProjectDir="$(ProjectDir)"
+                OutputPath="$(OutputPath)"
+                AssemblyName="$(AssemblyName)"
+                MakeZip="true"/>
+	</Target>
 
 </Project>
