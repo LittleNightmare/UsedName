@@ -19,12 +19,14 @@ namespace UsedName.Structures
         public byte padding1;
         public ushort padding2;
         public byte one;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public byte[] unknown;
         // crash when UnmanagedType.LPUTF8Str
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
         public byte[] name;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
         public byte[] fcTag;
-
+        public byte zero;
     }
     [StructLayout(LayoutKind.Sequential, Size = 896)]
     public struct SocialList

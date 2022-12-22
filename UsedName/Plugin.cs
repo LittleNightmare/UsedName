@@ -21,6 +21,8 @@ using Dalamud.Data;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using UsedName.Structures;
 using Lumina.Excel.GeneratedSheets;
+using static UsedName.Configuration;
+using System.Text;
 
 namespace UsedName
 {
@@ -244,6 +246,9 @@ namespace UsedName
 
                 if (result)
                 {
+#if DEBUG
+                    PluginLog.Debug($"Find search target at {i}");
+#endif
                     return true;
                 }
             }
@@ -258,8 +263,8 @@ namespace UsedName
             if (direction != NetworkMessageDirection.ZoneDown) return;
             if (Service.ClientState.LocalPlayer == null || Service.ClientState.TerritoryType == 0) return;
             // IDK how to get length of packaget, so i ignore it
-            int size = 896;
-            byte[] bytes = new byte[896];
+            int size = size = Marshal.SizeOf(typeof(SocialList)); ;
+            byte[] bytes = new byte[size];
             try
             {
                 Marshal.Copy(dataPtr, bytes, 0, size);
@@ -269,18 +274,22 @@ namespace UsedName
                 PluginLog.LogError(e.Message);
             }
 #if DEBUG
-            // CN 6.11
-            var corretOpcode = 0x00FD;
+            // CN 6.2
+            var corretOpcode = 0x0368;
             if (corretOpcode == opCode)
             {
-                PluginLog.Log("opcode is correct" + bytes.Length);
+                PluginLog.Debug("opcode is correct, copied length:" + bytes.Length);
             }
+            var playerCID = Service.ClientState.LocalContentId;
+            IncludesBytes(bytes, BitConverter.GetBytes(playerCID));
 #endif
             //if (bytes.Length != 896) return;
             if (bytes[13-1] != 1) return;
             var playerName = Service.ClientState.LocalPlayer.Name.ToString();
             if (!IncludesBytes(bytes, System.Text.Encoding.UTF8.GetBytes(playerName))) return;
-            
+#if DEBUG
+            PluginLog.Debug("Character name successfully detected");
+#endif
             try
             {
                 var temp = Structures.StructureReader.Read(bytes, Structures.StructureReader.StructureType.SocialList);
@@ -288,12 +297,17 @@ namespace UsedName
                 if (!temp.TryGetValue(Service.ClientState.LocalContentId,out var tempname)) return;
                 if (!tempname.Equals(playerName)) return;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+#if DEBUG
+                PluginLog.Debug(e.ToString());
+#endif
                 return;
             }
-            
-           
+#if DEBUG
+            PluginLog.Debug("Pass memory test");
+#endif
+
             var gameVersiontext = Service.DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
             Service.Configuration.GameVersion = gameVersiontext;
             Service.Configuration.SocialListOpcode = opCode;
