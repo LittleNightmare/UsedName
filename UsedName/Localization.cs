@@ -60,7 +60,8 @@ namespace UsedName
         public void StoreLanguage()
         {
             var str = JsonConvert.SerializeObject(this.languageDict);
-            File.WriteAllText(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), this.currentLanguage + ".json"), str);
+            string TempPath = @"F:\ffxiv";
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(TempPath), this.currentLanguage + ".json"), str);
         }
 
 #endif
