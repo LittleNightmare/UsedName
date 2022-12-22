@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<IsBuildForCN>true</IsBuildForCN>
+	<IsBuildForCN>false</IsBuildForCN>
   </PropertyGroup>
   <PropertyGroup Condition="$(IsBuildForCN) != 'true'">
 	<DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
