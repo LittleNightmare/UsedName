@@ -263,7 +263,7 @@ namespace UsedName
             if (direction != NetworkMessageDirection.ZoneDown) return;
             if (Service.ClientState.LocalPlayer == null || Service.ClientState.TerritoryType == 0) return;
             // IDK how to get length of packaget, so i ignore it
-            int size = size = Marshal.SizeOf(typeof(SocialList)); ;
+            int size = Marshal.SizeOf(typeof(SocialList)); ;
             byte[] bytes = new byte[size];
             try
             {
