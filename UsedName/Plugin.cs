@@ -322,11 +322,11 @@ namespace UsedName
             currentPlayersList = Structures.StructureReader.Read(data, Structures.StructureReader.StructureType.SocialList);
             // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
             // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
-            // 8 = New Adventurer/Returner; 9 = Mentor
+            // 10 = Mentor;11 = New Adventurer/Returner; 
             var type = currentPlayersList.TryGetValue(0, out _) ? currentPlayersList[0] : "";
             currentPlayersList.Remove(0);
-  
-            string[] knownType = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+
+            string[] knownType = { "1", "2", "3", "4", "5", "6", "7", "10", "11" };
             if (!knownType.Contains(type))
             {
 #if DEBUG
