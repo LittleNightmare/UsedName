@@ -59,31 +59,29 @@ namespace UsedName.Structures
             {
                 case StructureType.SocialList:
 #if DEBUG
-                    PluginLog.LogDebug($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.type}");
-                    PluginLog.LogDebug($"At padding {socialList.padding}, {socialList.padding1}, {socialList.padding2},{socialList.padding3}");
+                    PluginLog.LogDebug($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.ListType}");;
 #endif
                     // type: 1 = Party List; 2 = Friend List; 4 = Player Search; 3=????
-                    //if (socialList.type != 2) break;
+                    //if (socialList.ListType != 2) break;
                     foreach (var entry in socialList.entries)
                     {
-                        var name = Encoding.UTF8.GetString(entry.name).TrimEnd('\0');
+                        var name = Encoding.UTF8.GetString(entry.CharacterName).TrimEnd('\0');
                         // some player would not get name. some are Unable to Retrieve, some from other world. are they really save on local? 
                         if (string.IsNullOrEmpty(name)) 
                         {
 #if DEBUG
                             // entry.bytes is only different part. it seems to consist of 3 parts. At the middle 4 bytes always 00-00-00-00
-                            PluginLog.LogDebug($"name IsNullOrEmpty {entry.contentId}:{name}\n" +
-                                $"{BitConverter.ToString(entry.bytes)}");
+                            PluginLog.LogDebug($"name IsNullOrEmpty {entry.CharacterID}:{name}\n");
 #endif
                             continue;
                         }
 
-                        if(!result.TryAdd(entry.contentId, name))
+                        if(!result.TryAdd(entry.CharacterID, name))
                         {
-                            PluginLog.LogWarning($"Duplicate entry {entry.contentId} {name}");
+                            PluginLog.LogWarning($"Duplicate entry {entry.CharacterID} {name}");
                         }
                     }
-                    result.Add(0, socialList.type.ToString());
+                    result.Add(0, socialList.ListType.ToString());
                     break;
                 case StructureType.BlackList:
                     // not work, i cannot find any player's name, it is always empty. CN opcode is 0x0250
@@ -100,32 +98,32 @@ namespace UsedName.Structures
             return result;
         }
 
-        public static unsafe SocialList SocialListRead(IntPtr dataPtr)
-        {
-            SocialList socialList = new SocialList();
-            using (var unmanagedMemoryStream = new UnmanagedMemoryStream((byte*)dataPtr.ToPointer(), 896L))
-            {
-                using (var binaryReader = new BinaryReader(unmanagedMemoryStream, System.Text.Encoding.UTF8))
-                {
-                    socialList.padding = binaryReader.ReadUInt32();
-                    socialList.padding1 = binaryReader.ReadUInt32();
-                    socialList.padding2 = binaryReader.ReadUInt32();
-                    socialList.type = binaryReader.ReadByte();
-                    socialList.sequence = binaryReader.ReadByte();
-                    socialList.padding3 = binaryReader.ReadUInt16();
-                    socialList.entries = new PlayerEntry[10];
-                    for (var i = 0; i < 10; i++)
-                    {
-                        var readBuffer = binaryReader.ReadBytes(Marshal.SizeOf(typeof(PlayerEntry)));
-                        GCHandle handle = GCHandle.Alloc(readBuffer, GCHandleType.Pinned);
-                        socialList.entries[i] = (PlayerEntry)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PlayerEntry));
-                        handle.Free();
-                    }
-                }
-            }
+        //public static unsafe SocialList SocialListRead(IntPtr dataPtr)
+        //{
+        //    SocialList socialList = new SocialList();
+        //    using (var unmanagedMemoryStream = new UnmanagedMemoryStream((byte*)dataPtr.ToPointer(), 896L))
+        //    {
+        //        using (var binaryReader = new BinaryReader(unmanagedMemoryStream, System.Text.Encoding.UTF8))
+        //        {
+        //            socialList.padding = binaryReader.ReadUInt32();
+        //            socialList.padding1 = binaryReader.ReadUInt32();
+        //            socialList.padding2 = binaryReader.ReadUInt32();
+        //            socialList.type = binaryReader.ReadByte();
+        //            socialList.sequence = binaryReader.ReadByte();
+        //            socialList.padding3 = binaryReader.ReadUInt16();
+        //            socialList.entries = new PlayerEntry[10];
+        //            for (var i = 0; i < 10; i++)
+        //            {
+        //                var readBuffer = binaryReader.ReadBytes(Marshal.SizeOf(typeof(PlayerEntry)));
+        //                GCHandle handle = GCHandle.Alloc(readBuffer, GCHandleType.Pinned);
+        //                socialList.entries[i] = (PlayerEntry)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PlayerEntry));
+        //                handle.Free();
+        //            }
+        //        }
+        //    }
 
 
-            return socialList;
-        }
+        //    return socialList;
+        //}
     }
 }
