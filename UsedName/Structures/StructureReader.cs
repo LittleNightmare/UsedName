@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dalamud.Logging;
+using Lumina.Excel.GeneratedSheets;
 
 namespace UsedName.Structures
 {
@@ -80,6 +82,12 @@ namespace UsedName.Structures
                         {
                             PluginLog.LogWarning($"Duplicate entry {entry.CharacterID} {name}");
                         }
+#if DEBUG
+                        if (true)
+                        {
+                            PluginLog.LogDebug($"{name}:{String.Join(", ", GetOnlineStatus(entry.OnlineStatus))}");
+                        }
+#endif
                     }
                     result.Add(0, socialList.ListType.ToString());
                     break;
@@ -96,6 +104,18 @@ namespace UsedName.Structures
                     return result;
             }
             return result;
+        }
+
+        public static List<string>? GetOnlineStatus(long onlineStatus)
+        {
+
+            BitArray os = new BitArray(BitConverter.GetBytes(onlineStatus));
+            var result = Service.DataManager.GetExcelSheet<OnlineStatus>()
+                .Where(s => os.Get((int)s.RowId))
+                .OrderBy(s => s.Priority)
+                .Select(s => s.Name.ToString());
+            
+            return result.ToList();
         }
 
         //public static unsafe SocialList SocialListRead(IntPtr dataPtr)

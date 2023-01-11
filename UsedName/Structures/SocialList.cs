@@ -14,14 +14,15 @@ namespace UsedName.Structures
         public byte HierarchyGroup;
         public byte HierarchyUnk;
         public ushort TerritoryType;
-        public byte __padding1;
-        public byte __padding2;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public byte[] unknown0;
         public byte GrandCompanyID;
         public byte Region;
         public byte SelectRegion;
         public byte IsSearchComment;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
-        public byte[] OnlineStatus;
+        public ushort __padding1;
+        public ushort __padding2;
+        public long OnlineStatus;
         //public ulong OnlineStatus;
         //public uint unknown;
         public byte CurrentClassID;
@@ -30,7 +31,7 @@ namespace UsedName.Structures
         public ushort SelectLevel;
         public byte Identity;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-        public byte[] unknown;
+        public byte[] unknown1;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] CharacterName;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 7)]
