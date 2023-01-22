@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>LittleNightmare</Authors>
     <Company></Company>
-    <Version>0.7.7.0</Version>
+    <Version>0.7.8.0</Version>
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Platforms>x64</Platforms>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -60,20 +60,17 @@
 	
   <ItemGroup Condition="$(IsBuildForCN)!='true'">
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
-    <PackageReference Include="XivCommon" Version="6.0.2" />
+    <PackageReference Include="XivCommon" Version="7.0.0-alpha.1" />
   </ItemGroup>
 	
   <ItemGroup Condition="$(IsBuildForCN)=='true' And $(TargetFramework)=='net6.0-windows'">
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.1" />
     <PackageReference Include="XivCommon" Version="6.0.2" />
   </ItemGroup>
-  <ItemGroup Condition="$(IsBuildForCN)=='true' And $(TargetFramework)=='net5.0-windows'">
-    <PackageReference Include="Dalamud.ContextMenu" Version="1.1.1" />
-    <PackageReference Include="XivCommon" Version="5.0.0" />
-  </ItemGroup>
+
 
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="2.1.8" />
+    <PackageReference Include="DalamudPackager" Version="2.1.10" />
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
       <Private>false</Private>

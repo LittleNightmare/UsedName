@@ -77,16 +77,14 @@ namespace UsedName.Structures
 #endif
                             continue;
                         }
-
+                        
                         if(!result.TryAdd(entry.CharacterID, name))
                         {
                             PluginLog.LogWarning($"Duplicate entry {entry.CharacterID} {name}");
                         }
 #if DEBUG
-                        if (true)
-                        {
-                            PluginLog.LogDebug($"{name}:{String.Join(", ", GetOnlineStatus(entry.OnlineStatus))}");
-                        }
+                        PluginLog.LogDebug($"{name}:{String.Join(", ", GetOnlineStatus(entry.OnlineStatus))}");
+                        PluginLog.Debug($"{entry.__padding2}");
 #endif
                     }
                     result.Add(0, socialList.ListType.ToString());
