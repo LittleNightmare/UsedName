@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 
 namespace UsedName.Structures
 {
@@ -7,7 +8,12 @@ namespace UsedName.Structures
     {
         public ulong contentId;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte[] name;
+        public byte[] nameBytes;
+
+        public string name
+        {
+            get => Encoding.UTF8.GetString(nameBytes).TrimEnd('\0');
+        }
     }
     [StructLayout(LayoutKind.Sequential, Size = 808)]
     struct BlackList

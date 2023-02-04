@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 
 namespace UsedName.Structures
 {
@@ -33,9 +34,14 @@ namespace UsedName.Structures
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
         public byte[] unknown1;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte[] CharacterName;
+        public byte[] CharacterNameBytes;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 7)]
         public byte[] FcTag;
+
+        public string CharacterName
+        {
+            get => Encoding.UTF8.GetString(CharacterNameBytes).TrimEnd('\0');
+        }
     }
     [StructLayout(LayoutKind.Sequential, Size = 896)]
     public struct SocialList
