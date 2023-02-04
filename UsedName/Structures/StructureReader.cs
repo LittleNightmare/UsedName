@@ -16,50 +16,28 @@ namespace UsedName.Structures
             SocialList,
             BlackList
         }
-        public static unsafe IDictionary<ulong, string> Read(byte[] data, StructureType type)
+        public static unsafe IDictionary<ulong, string> Read <T>(byte[] data)
+            where T : struct
         {
             var result = new Dictionary<ulong, string>();
-            SocialList socialList = new ();
-            BlackList blackList = new ();
-            
+            T list;
             // transfer data to InPtr
-            int size;
-            IntPtr buffer;
-            switch (type)
+            int size = Marshal.SizeOf(typeof(T));
+            IntPtr buffer = buffer = Marshal.AllocHGlobal(size);
+            try
             {
-                case StructureType.SocialList:
-                    size = Marshal.SizeOf(typeof(SocialList));
-                    buffer = Marshal.AllocHGlobal(size);
-                    try
-                    {
-                        Marshal.Copy(data, 0, buffer, size);
-                        socialList = (SocialList)Marshal.PtrToStructure(buffer, typeof(SocialList));
-                    }
-                    finally
-                    {
-                        Marshal.FreeHGlobal(buffer);
-                    }
-                    break;
-                case StructureType.BlackList:
-                    size = Marshal.SizeOf(typeof(SocialList));
-                    buffer = Marshal.AllocHGlobal(size);
-                    Marshal.Copy(data, 0, buffer, size);
-                    try
-                    {
-                        Marshal.Copy(data, 0, buffer, size);
-                        blackList = (BlackList)Marshal.PtrToStructure(buffer, typeof(BlackList));
-                    }
-                    finally
-                    {
-                        Marshal.FreeHGlobal(buffer);
-                    }
-                    break;
+                Marshal.Copy(data, 0, buffer, size);
+                list = (T)Marshal.PtrToStructure(buffer, typeof(T));
             }
-
-            // Adjust data
-            switch (type)
+            finally
             {
-                case StructureType.SocialList:
+                Marshal.FreeHGlobal(buffer);
+            }
+            
+            // Adjust data
+            switch (list)
+            {
+                case SocialList socialList:
 #if DEBUG
                     PluginLog.LogDebug($"Read {socialList.entries.Length} entries from SocialList, and type is {socialList.ListType}");;
 #endif
@@ -67,7 +45,7 @@ namespace UsedName.Structures
                     //if (socialList.ListType != 2) break;
                     foreach (var entry in socialList.entries)
                     {
-                        var name = Encoding.UTF8.GetString(entry.CharacterName).TrimEnd('\0');
+                        var name = entry.CharacterName;
                         // some player would not get name. some are Unable to Retrieve, some from other world. are they really save on local? 
                         if (string.IsNullOrEmpty(name)) 
                         {
@@ -89,13 +67,12 @@ namespace UsedName.Structures
                     }
                     result.Add(0, socialList.ListType.ToString());
                     break;
-                case StructureType.BlackList:
+                case BlackList blackList:
                     // not work, i cannot find any player's name, it is always empty. CN opcode is 0x0250
                     foreach (var entry in blackList.entry)
                     {
-                        var name = Encoding.UTF8.GetString(entry.name).TrimEnd('\0'); ;
-                        if (string.IsNullOrEmpty(name)) continue;
-                        result.Add(entry.contentId, name);
+                        if (string.IsNullOrEmpty(entry.name)) continue;
+                        result.Add(entry.contentId, entry.name);
                     }
                     break;
                 default:
@@ -108,7 +85,7 @@ namespace UsedName.Structures
         {
 
             BitArray os = new BitArray(BitConverter.GetBytes(onlineStatus));
-            var result = Service.DataManager.GetExcelSheet<OnlineStatus>()
+            var result = Service.DataManager.GetExcelSheet<OnlineStatus>()?
                 .Where(s => os.Get((int)s.RowId))
                 .OrderBy(s => s.Priority)
                 .Select(s => s.Name.ToString());

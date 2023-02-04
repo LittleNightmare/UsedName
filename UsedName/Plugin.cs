@@ -292,7 +292,7 @@ namespace UsedName
 #endif
             try
             {
-                var temp = Structures.StructureReader.Read(bytes, Structures.StructureReader.StructureType.SocialList);
+                var temp = StructureReader.Read<SocialList>(bytes);
                 if (temp[0] != "1") return;
                 if (!temp.TryGetValue(Service.ClientState.LocalContentId,out var tempname)) return;
                 if (!tempname.Equals(playerName)) return;
@@ -319,7 +319,7 @@ namespace UsedName
         private unsafe void GetDataFromNetwork(byte[] data)
         {
             IDictionary<ulong, string> currentPlayersList;
-            currentPlayersList = Structures.StructureReader.Read(data, Structures.StructureReader.StructureType.SocialList);
+            currentPlayersList = StructureReader.Read<SocialList>(data);
             // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
             // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
             // 10 = Mentor;11 = New Adventurer/Returner; 
