@@ -21,6 +21,8 @@ using UsedName.Structs;
 using Lumina.Excel.GeneratedSheets;
 using System.Text;
 using Dalamud.Hooking;
+using Dalamud.Utility;
+
 namespace UsedName
 {
     public sealed class UsedName : IDalamudPlugin
@@ -68,6 +70,7 @@ namespace UsedName
             Service.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = Service.Loc.Localize("Use '/pname' or '/pname update' to update data from FriendList\n") +
+                Service.Loc.Localize("Use '/pname main' to open Main window\n") +
                 Service.Loc.Localize("Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n") +
                 Service.Loc.Localize("Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n") +
                 Service.Loc.Localize("(Format require:first last nickname; first last nick name)\n") +
@@ -141,6 +144,10 @@ namespace UsedName
             {
                 this.DrawConfigUI();
             }
+            else if (args.StartsWith("main"))
+            {
+                this.DrawMainUI();
+            }
             else
             {
                 Service.Chat.PrintError(Service.Loc.Localize($"Invalid parameter: ")+args);
@@ -157,6 +164,11 @@ namespace UsedName
         {
             Service.PluginUi.Visible = true;
         }
+
+        internal void DrawEdittingUI()
+        {
+            Service.PluginUi.EdittingVisible = true;
+        }
         private void DrawConfigUI()
         {
             Service.PluginUi.SettingsVisible = true;
@@ -165,8 +177,9 @@ namespace UsedName
         private unsafe void GetSocialListDetour(uint targetId, IntPtr data)
         {
             var socialList = Marshal.PtrToStructure<SocialListResult>(data);
+            Service.GetSocialListHook?.Original(targetId, data);
             string listType = socialList.ListType.ToString();
-            PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}");
+            PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}:{socialList.Index}:{socialList.NextIndex}:{socialList.RequestKey}:{socialList.RequestParam}");
             PluginLog.Debug($"ListType:{socialList.ListType:X}");
             // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
             // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
@@ -192,15 +205,17 @@ namespace UsedName
             var result = new Dictionary<ulong, string>();
             foreach (var c in socialList.CharacterEntries)
             {
-                if (c.CharacterID == 0 || c.CharacterID == Service.ClientState.LocalContentId)
+                if (c.CharacterID == 0||
+                    c.CharacterID == Service.ClientState.LocalContentId||
+                    c.CharacterName.IsNullOrEmpty())
                     continue;
                 if (!result.TryAdd(c.CharacterID, c.CharacterName))
                 {
                     PluginLog.LogWarning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
                 }
             }
-            UpdatePlayerNames(result);
-            Service.GetSocialListHook?.Original(targetId, data);
+            UpdatePlayerNames(result, false);
+            
         }
 
         internal void GetDataFromXivCommon()
@@ -357,6 +372,13 @@ namespace UsedName
 
             return new string[] { playerName, nickName };
 
+        }
+
+        internal void RemovePlayer(ulong id)
+        {
+            Service.Chat.Print(string.Format(Service.Loc.Localize("Remove player {0} from list"), Service.Configuration.playersNameList[id].currentName));
+            Service.Configuration.playersNameList.Remove(id);
+            Service.Configuration.storeNames();
         }
     }
 }

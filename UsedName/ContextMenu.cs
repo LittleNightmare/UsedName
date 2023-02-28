@@ -79,7 +79,7 @@ public class ContextMenu : IDisposable
             return;
         }
         Service.TempPlayerName = args.Text.ToString();
-        plugin.DrawMainUI();
+        plugin.DrawEdittingUI();
     }
 
     private void Search(GameObjectContextMenuItemSelectedArgs args)

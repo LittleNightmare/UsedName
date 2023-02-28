@@ -23,7 +23,8 @@ namespace UsedName
         internal static XivCommonBase Common { get; set; } = null!;
         internal static DalamudContextMenu ContextMenu { get; set; } = null!;
         internal static ContextMenu ContextMenuManager { get; set; } = null!;
-        internal static string TempPlayerName { get; set; } = null!;
+        internal static string? TempPlayerName;
+        internal static ulong TempPlayerID;
         internal static Localization Loc { get; set; } = null!;
 
         internal unsafe delegate void GetSocialListDelegate(uint targetId, IntPtr SocialList);

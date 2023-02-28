@@ -1,5 +1,8 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Logging;
+using Dalamud.Utility;
+using ImGuiNET;
 using System;
+using System.Linq;
 using System.Numerics;
 
 namespace UsedName
@@ -16,6 +19,12 @@ namespace UsedName
         {
             get { return this.visible; }
             set { this.visible = value; }
+        }
+        private bool edittingVisible = false;
+        public bool EdittingVisible
+        {
+            get { return this.edittingVisible; }
+            set { this.edittingVisible = value; }
         }
 
         private bool settingsVisible = false;
@@ -44,10 +53,15 @@ namespace UsedName
             // it actually makes sense.
             // There are other ways to do this, but it is generally best to keep the number of
             // draw delegates as low as possible.
-
             DrawMainWindow();
+            DrawEdittingWindow();
             DrawSettingsWindow();
         }
+
+        private string[] tableColum = new string[]
+        {
+            "CurrentName","NickName","FirstUsedName","ShowMoreUsedName","Edit","Remove"
+        };
 
         public void DrawMainWindow()
         {
@@ -55,14 +69,99 @@ namespace UsedName
             {
                 return;
             }
+            ImGui.SetNextWindowSize(new Vector2(550, 410), ImGuiCond.FirstUseEver);
+            if (ImGui.Begin("Used Name", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            {
+                if (ImGui.Button(Service.Loc.Localize("Setting")))
+                {
+                    this.SettingsVisible = !this.SettingsVisible;
+                }
+                ImGui.SameLine();
+                ImGui.Text(Service.Loc.Localize("Search:"));
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(200);
+                var searchContent = "";
+                ImGui.InputTextWithHint("",Service.Loc.Localize("Enter player's name here"), ref searchContent, 250);
+
+                if (ImGui.BeginTable("SocialList", tableColum.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
+                {
+                    foreach (var t in tableColum)
+                    {
+                        var c = Service.Loc.Localize(t);
+                        ImGui.TableSetupColumn(c, ImGuiTableColumnFlags.None, c.Length);
+                    }
+                    ImGui.TableHeadersRow();
+                    var index = 0;
+                    foreach(var (id, player) in Service.Configuration.playersNameList.Where(item => item.Value.currentName.Contains(searchContent)||
+                                                                                                    item.Value.nickName.Contains(searchContent)||
+                                                                                                    item.Value.usedNames.Any(u => u.Contains(searchContent))))
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        ImGui.Text(player.currentName);
+                        ImGui.TableNextColumn();
+                        ImGui.Text(player.nickName);
+                        ImGui.TableNextColumn();
+                        var firstUsedName = player.usedNames.Where(n => !n.IsNullOrEmpty()).ToList().Count>=1 ? player.usedNames.Where(n=>!n.IsNullOrEmpty()).First() : "";
+                        ImGui.Text(firstUsedName);
+                        ImGui.TableNextColumn();
+                        if (ImGui.Button(Service.Loc.Localize("Show") +$"##{index}"))
+                        {
+                            var temp = string.IsNullOrEmpty(player.nickName) ? "" : "(" + player.nickName + ")";
+                            Service.Chat.Print($"{player.currentName}{temp}: [{string.Join(",", player.usedNames)}]");
+                        }
+                        ImGui.TableNextColumn();
+                        if (ImGui.Button(Service.Loc.Localize("Edit") + $"##{index}"))
+                        {
+                            Service.TempPlayerName = player.currentName;
+                            Service.TempPlayerID = id;
+                            this.EdittingVisible = true;
+                        }
+                        ImGui.TableNextColumn();
+                        if (ImGui.Button(Service.Loc.Localize("Remove") + $"##{index}") &&ImGui.IsKeyPressed(ImGuiKey.LeftCtrl))
+                        {
+                            this.plugin.RemovePlayer(id);
+                        }
+                        if (ImGui.IsItemHovered())
+                        {
+                            ImGui.SetTooltip(Service.Loc.Localize("Holding LeftCtrl to Remove this record. It will be re-added on update base on your setting,\nbut will not contain the previous data (e.g. used names, nickname)"));
+                        }
+                        ImGui.TableNextColumn();
+                        index++;
+                    }
+                }
+                ImGui.EndTable();
+
+            }
+
+        }
+
+        public void DrawEdittingWindow()
+        {
+            if (!EdittingVisible)
+            {
+                return;
+            }
 
             ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin(Service.Loc.Localize("Used Name: Add nick name"), ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.Begin(Service.Loc.Localize("Used Name: Edit nick name"), ref this.edittingVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 ImGui.Text(Service.TempPlayerName + Service.Loc.Localize("'s current nick name:"));
                 var target = this.plugin.GetPlayerByNameFromFriendList(Service.TempPlayerName);
-                if (target.Equals( new XivCommon.Functions.FriendList.FriendListEntry())||!Service.Configuration.playersNameList.TryGetValue(target.ContentId, out _))
+                bool isEmpty = target.Equals(new XivCommon.Functions.FriendList.FriendListEntry());
+                ulong targetID = isEmpty? Service.TempPlayerID : target.ContentId;
+                if (Service.Configuration.playersNameList.TryGetValue(targetID, out var tar1) && tar1.currentName == Service.TempPlayerName)
+                {
+                    var nickName = Service.Configuration.playersNameList[targetID].nickName;
+                    // var nickName = target.nickName;
+                    if (ImGui.InputText("##CurrentNickName", ref nickName, 250))
+                    {
+                        Service.Configuration.playersNameList[targetID].nickName = nickName;
+                        Service.Configuration.storeNames();
+                    }
+                }
+                else
                 {
                     ImGui.Text(String.Format(Service.Loc.Localize("NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList"), Service.TempPlayerName));
                     ImGui.Spacing();
@@ -71,16 +170,7 @@ namespace UsedName
                         this.plugin.GetDataFromXivCommon();
                     }
                 }
-                else
-                {
-                    var nickName = Service.Configuration.playersNameList[target.ContentId].nickName;
-                    // var nickName = target.nickName;
-                    if (ImGui.InputText("##CurrentNickName", ref nickName, 250))
-                    {
-                        Service.Configuration.playersNameList[target.ContentId].nickName = nickName;
-                        Service.Configuration.storeNames();
-                    }
-                }
+                
 
             }
             ImGui.End();
@@ -99,6 +189,11 @@ namespace UsedName
                 if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
                 {
                     this.plugin.GetDataFromXivCommon();
+                }
+                ImGui.SameLine();
+                if (ImGui.Button(Service.Loc.Localize("Open Main Window")))
+                {
+                    this.Visible= !this.Visible;
                 }
                 ImGui.Spacing();
                 ImGui.Text(Service.Loc.Localize("Language:"));

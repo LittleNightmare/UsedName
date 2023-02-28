@@ -57,7 +57,7 @@ public unsafe struct CharacterEntry
         get
         {
             fixed (byte* ptr = this.CharacterNameBytes) {
-                return Encoding.UTF8.GetString(ptr, 31);
+                return Encoding.UTF8.GetString(ptr, 31).TrimEnd('\0');
             }
         }
         set { }
@@ -68,7 +68,7 @@ public unsafe struct CharacterEntry
         get
         {
             fixed (byte* ptr = this.CharacterNameBytes) {
-                return Encoding.UTF8.GetString(ptr, 6);
+                return Encoding.UTF8.GetString(ptr, 6).TrimEnd('\0');
             }
         }
         set { }
