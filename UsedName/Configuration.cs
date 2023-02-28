@@ -21,7 +21,7 @@ namespace UsedName
 
         public bool ShowNameChange = true;
 
-        public bool EnableSearchInContext = false;
+        public bool EnableSearchInContext = true;
         public string SearchString = "Search Used Name";
 
         public bool EnableAddNickName = true;
@@ -31,10 +31,6 @@ namespace UsedName
         public bool UpdateFromPartyList = false;
         public bool UpdateFromFriendList = true;
         public bool UpdateFromPlayerSearch = false;
-
-        public bool AutoCheckOpcodeUpdate = true;
-        public int SocialListOpcode = 0;
-        public string GameVersion = (new Dalamud.Game.GameVersion(0000)).ToString();
 
         public class PlayersNames
         {

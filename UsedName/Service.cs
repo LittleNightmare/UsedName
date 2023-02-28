@@ -11,6 +11,8 @@ using Dalamud.Plugin;
 using Dalamud.Game.Network;
 using XivCommon;
 using Dalamud.ContextMenu;
+using Dalamud.Hooking;
+using System;
 
 namespace UsedName
 {
@@ -24,8 +26,13 @@ namespace UsedName
         internal static string TempPlayerName { get; set; } = null!;
         internal static Localization Loc { get; set; } = null!;
 
+        internal unsafe delegate void GetSocialListDelegate(uint targetId, IntPtr SocialList);
+        internal static Hook<GetSocialListDelegate> GetSocialListHook { get; set; } = null!;
+
         [PluginService]
         internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        [PluginService]
+        internal static SigScanner Scanner { get; private set; } = null!;
         [PluginService]
         internal static ClientState ClientState { get; private set; } = null!;
         [PluginService]

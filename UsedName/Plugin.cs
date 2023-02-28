@@ -14,16 +14,13 @@ using XivCommon;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-// using Dalamud.Data;
 using Dalamud.Logging;
 using System.Runtime.InteropServices;
 using Dalamud.Data;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using UsedName.Structures;
+using UsedName.Structs;
 using Lumina.Excel.GeneratedSheets;
-using static UsedName.Configuration;
 using System.Text;
-
+using Dalamud.Hooking;
 namespace UsedName
 {
     public sealed class UsedName : IDalamudPlugin
@@ -32,11 +29,6 @@ namespace UsedName
         public string Name => "Used Name";
 
         private const string commandName = "/pname";
-
-        // interrupt between UI and ContextMenu
-
-        internal bool DetectOpcode { get; set; } = false;
-
 
         public UsedName(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
@@ -65,6 +57,11 @@ namespace UsedName
             }
             Service.Loc = new Localization(Service.Configuration.Language);
 
+            if (Service.Scanner.TryScanText("48 89 5c 24 ?? 56 48 ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 48 ?? ?? e8 ?? ?? ?? ?? 48 ?? ?? 48 ?? ?? 0f 84 ?? ?? ?? ?? 0f", out var ptr0))
+            {
+                Service.GetSocialListHook = Hook<Service.GetSocialListDelegate>.FromAddress(ptr0, GetSocialListDetour);
+            }
+
             // you might normally want to embed resources and load them from the manifest stream
             Service.PluginUi = new PluginUI(this);
             
@@ -80,63 +77,22 @@ namespace UsedName
             // first time
             if (Service.Configuration.playersNameList.Count <= 0)
             {
-                this.GetDataFromMemory();
-            }
-
-            if (Service.Configuration.SocialListOpcode == 0)
-            {
-                this.DetectOpcode = true;
-                //this.UpdateOpcode();
-            }
-            var gameVersiontext = Service.DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
-            if (new GameVersion(Service.Configuration.GameVersion) < new GameVersion(gameVersiontext)&& Service.Configuration.AutoCheckOpcodeUpdate)
-            {
-                this.DetectOpcode = true;
+                this.GetDataFromXivCommon();
             }
 
             Service.PluginInterface.UiBuilder.Draw += DrawUI;
             Service.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            Service.Network.NetworkMessage += OnNetworkEventDetectOpcode;
-            Service.Network.NetworkMessage += OnNetworkEvent;
-
-
+            if(Service.Configuration.EnableAutoUpdate)
+                Service.GetSocialListHook?.Enable();
         }
-
-        //public void UpdateOpcode()
-        //{
-        //    //not need anymore
-        //    var lastOpcodeVersion = new GameVersion(Configuration.GameVersion);
-        //    if (this.ClientState.ClientLanguage == ClientLanguage.ChineseSimplified)
-        //    {
-        //        var lastestOpcodeVersionCN = new GameVersion("2022.07.22.0000.0000");
-        //        if (lastOpcodeVersion < lastestOpcodeVersionCN)
-        //        {
-        //            // 6.1
-        //            Configuration.SocialListOpcode = 0x0396;
-        //            Configuration.GameVersion = lastestOpcodeVersionCN.ToString();
-        //        }
-                
-        //    }
-        //    else
-        //    {
-        //        var lastestOpcodeVersionGlobal = new GameVersion("2022.07.08.0000.0000");
-        //        if (lastOpcodeVersion < lastestOpcodeVersionGlobal)
-        //        {
-        //            // waiting for someone find it, now is 6.15? i guess
-        //            Configuration.SocialListOpcode = 0x0303;
-        //            Configuration.GameVersion = lastestOpcodeVersionGlobal.ToString();
-        //        }
-        //    }
-        //    this.Configuration.Save();
-        //}
 
         public void Dispose()
         {
+            Service.GetSocialListHook?.Disable();
+            Service.GetSocialListHook?.Dispose();
             Service.PluginInterface.UiBuilder.Draw -= DrawUI;
             Service.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
             Service.PluginUi.Dispose();
-            Service.Network.NetworkMessage -= OnNetworkEventDetectOpcode;
-            Service.Network.NetworkMessage -= OnNetworkEvent;
             Service.CommandManager.RemoveHandler(commandName);
             Service.Common.Dispose();
             Service.ContextMenuManager.Dispose();
@@ -152,7 +108,7 @@ namespace UsedName
         {
             if (args == "update"|| args == "")
             {
-                this.GetDataFromMemory();
+                this.GetDataFromXivCommon();
             }
             else if (args.StartsWith("search"))
             {
@@ -205,157 +161,49 @@ namespace UsedName
         {
             Service.PluginUi.SettingsVisible = true;
         }
-        
-        private void OnNetworkEvent(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
+
+        private unsafe void GetSocialListDetour(uint targetId, IntPtr data)
         {
-            if (!Service.Configuration.EnableAutoUpdate) return;
-            if (this.DetectOpcode) return;
-            if (!Service.ClientState.IsLoggedIn) return;
-            if (direction != NetworkMessageDirection.ZoneDown) return;
-            if (Service.ClientState.LocalPlayer == null || Service.ClientState.TerritoryType == 0) return;
-            if (opCode != Service.Configuration.SocialListOpcode) return;
-
-            int size = Marshal.SizeOf(typeof(Structures.SocialList));
-            try
-            {
-                byte[] bytes = new byte[size];
-                Marshal.Copy(dataPtr, bytes, 0, size);
-                GetDataFromNetwork(bytes);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            
-        }
-        private bool IncludesBytes(byte[] source, byte[] search)
-        {
-            if (search == null) return false;
-
-            for (var i = 0; i < source.Length - search.Length; ++i)
-            {
-                var result = true;
-                for (var j = 0; j < search.Length; ++j)
-                {
-                    if (search[j] != source[i + j])
-                    {
-                        result = false;
-                        break;
-                    }
-                }
-
-                if (result)
-                {
-#if DEBUG
-                    PluginLog.Debug($"Find search target at {i}");
-#endif
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void OnNetworkEventDetectOpcode(IntPtr dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
-        {
-            if (!this.DetectOpcode) return;
-            if (!Service.ClientState.IsLoggedIn) return;
-            if (direction != NetworkMessageDirection.ZoneDown) return;
-            if (Service.ClientState.LocalPlayer == null || Service.ClientState.TerritoryType == 0) return;
-            // IDK how to get length of packaget, so i ignore it
-            int size = Marshal.SizeOf(typeof(SocialList)); ;
-            byte[] bytes = new byte[size];
-            try
-            {
-                Marshal.Copy(dataPtr, bytes, 0, size);
-            }
-            catch (Exception e)
-            {
-                PluginLog.LogError(e.Message);
-            }
-#if DEBUG
-            // CN 6.2
-            var corretOpcode = 0x0368;
-            if (corretOpcode == opCode)
-            {
-                PluginLog.Debug("opcode is correct, copied length:" + bytes.Length);
-            }
-            var playerCID = Service.ClientState.LocalContentId;
-            IncludesBytes(bytes, BitConverter.GetBytes(playerCID));
-#endif
-            //if (bytes.Length != 896) return;
-            if (bytes[13-1] != 1) return;
-            var playerName = Service.ClientState.LocalPlayer.Name.ToString();
-            if (!IncludesBytes(bytes, System.Text.Encoding.UTF8.GetBytes(playerName))) return;
-#if DEBUG
-            PluginLog.Debug("Character name successfully detected");
-#endif
-            try
-            {
-                var temp = StructureReader.Read<SocialList>(bytes);
-                if (temp[0] != "1") return;
-                if (!temp.TryGetValue(Service.ClientState.LocalContentId,out var tempname)) return;
-                if (!tempname.Equals(playerName)) return;
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                PluginLog.Debug(e.ToString());
-#endif
-                return;
-            }
-#if DEBUG
-            PluginLog.Debug("Pass memory test");
-#endif
-
-            var gameVersiontext = Service.DataManager.GameData.Repositories.First(repo => repo.Key == "ffxiv").Value.Version;
-            Service.Configuration.GameVersion = gameVersiontext;
-            Service.Configuration.SocialListOpcode = opCode;
-            Service.Configuration.Save();
-            this.DetectOpcode = false;
-            Service.Chat.Print(string.Format(Service.Loc.Localize("Opcode detected\n Game version: {0}\nOpcode: {1}"), gameVersiontext, opCode));
-        }
-
-        private unsafe void GetDataFromNetwork(byte[] data)
-        {
-            IDictionary<ulong, string> currentPlayersList;
-            currentPlayersList = StructureReader.Read<SocialList>(data);
+            var socialList = Marshal.PtrToStructure<SocialListResult>(data);
+            string listType = socialList.ListType.ToString();
+            PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}");
+            PluginLog.Debug($"ListType:{socialList.ListType:X}");
             // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
             // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
             // 10 = Mentor;11 = New Adventurer/Returner; 
-            var type = currentPlayersList.TryGetValue(0, out _) ? currentPlayersList[0] : "";
-            currentPlayersList.Remove(0);
-
             string[] knownType = { "1", "2", "3", "4", "5", "6", "7", "10", "11" };
-            if (!knownType.Contains(type))
+            if (!knownType.Contains(listType))
             {
 #if DEBUG
-                Service.Chat.Print($"UsedName: Find Unknown type: {type}");
+                Service.Chat.Print($"UsedName: Find Unknown type: {listType}");
 #endif
                 return;
             }
 
             string[] acceptType = { "1", "2", "4" };
 
-            if ((type == "1" && !Service.Configuration.UpdateFromPartyList)||
-                (type == "2" && !Service.Configuration.UpdateFromFriendList)||
-                (type == "4" && !Service.Configuration.UpdateFromPlayerSearch)||
-                !acceptType.Contains(type))
+            if ((listType == "1" && !Service.Configuration.UpdateFromPartyList) ||
+                (listType == "2" && !Service.Configuration.UpdateFromFriendList) ||
+                (listType == "4" && !Service.Configuration.UpdateFromPlayerSearch) ||
+                !acceptType.Contains(listType))
             {
                 return;
             }
-            // party list includes the player hiself, remove it
-            currentPlayersList.Remove(Service.ClientState.LocalContentId);
-#if DEBUG
-            foreach (var player in currentPlayersList)
+            var result = new Dictionary<ulong, string>();
+            foreach (var c in socialList.CharacterEntries)
             {
-                PluginLog.Debug($"{player.Key}:{player.Value}:{Service.Configuration.playersNameList.ContainsKey(player.Key)}");
+                if (c.CharacterID == 0 || c.CharacterID == Service.ClientState.LocalContentId)
+                    continue;
+                if (!result.TryAdd(c.CharacterID, c.CharacterName))
+                {
+                    PluginLog.LogWarning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
+                }
             }
-#endif
-            this.UpdatePlayerNames(currentPlayersList, showHint: false);
+            UpdatePlayerNames(result);
+            Service.GetSocialListHook?.Original(targetId, data);
         }
-        
-        internal void GetDataFromMemory()
+
+        internal void GetDataFromXivCommon()
         {
             var friendList = Service.Common.Functions.FriendList.List.GetEnumerator();
             IDictionary<ulong, string> currentPlayersList = new Dictionary<ulong, string>();
@@ -375,7 +223,7 @@ namespace UsedName
                     Service.Chat.PrintError(Service.Loc.Localize($"Update Player List Fail\nMay cause by incompatible version of XivCommon\nPlease contact to developer"));
                     return;
                 }
-                
+
             }
             UpdatePlayerNames(currentPlayersList);
         }

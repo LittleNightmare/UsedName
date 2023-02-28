@@ -68,7 +68,7 @@ namespace UsedName
                     ImGui.Spacing();
                     if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
                     {
-                        this.plugin.GetDataFromMemory();
+                        this.plugin.GetDataFromXivCommon();
                     }
                 }
                 else
@@ -98,7 +98,7 @@ namespace UsedName
             {
                 if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
                 {
-                    this.plugin.GetDataFromMemory();
+                    this.plugin.GetDataFromXivCommon();
                 }
                 ImGui.Spacing();
                 ImGui.Text(Service.Loc.Localize("Language:"));
@@ -123,10 +123,17 @@ namespace UsedName
                 if(ImGui.Checkbox(Service.Loc.Localize("Enable Auto Update"), ref Service.Configuration.EnableAutoUpdate))
                 {
                     Service.Configuration.Save();
+                    if (Service.Configuration.EnableAutoUpdate)
+                    {
+                        Service.GetSocialListHook?.Enable();
+                    }else
+                    {
+                        Service.GetSocialListHook?.Disable();
+                    }
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Automatically update player name when opening FriendList"));
+                    ImGui.SetTooltip(Service.Loc.Localize("Automatically update the list of choices\nUpdate after opening the selected list\nThe option appears after checking"));
                 }
                 if (Service.Configuration.EnableAutoUpdate)
                 {
@@ -188,25 +195,6 @@ namespace UsedName
                         Service.Configuration.Save();
                     }
                     ImGui.Unindent();
-                }
-                ImGui.Spacing();
-                if (ImGui.Checkbox(Service.Loc.Localize("Auto Renew Opcode"), ref Service.Configuration.AutoCheckOpcodeUpdate))
-                {
-                    Service.Configuration.Save();
-                }
-                if (ImGui.IsItemHovered())
-                {
-                    ImGui.SetTooltip(Service.Loc.Localize("Auto renew Opcode after game update, please open PartyList to renew Opcode") +
-                        Service.Loc.Localize("\nIf you find that the plugin cannot update the player information automatically, it may be that the detected opcode is wrong. Please click Renew Opcode to solve it"));
-                }
-                ImGui.SameLine();
-                if (ImGui.Button(Service.Loc.Localize("Renew Opcode")))
-                {
-                    this.plugin.DetectOpcode = true;
-                }
-                if (ImGui.IsItemHovered())
-                {
-                    ImGui.SetTooltip(Service.Loc.Localize("Manually renew for Opcode updates, please open PartyList after click button immediately to renew Opcode"));
                 }
                 ImGui.End();
             }
