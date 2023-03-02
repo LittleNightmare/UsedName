@@ -9,6 +9,7 @@ using System.Text.Encodings.Web;
 using System.Text;
 using System.Text.Json;
 using System.Linq;
+using Dalamud;
 
 namespace UsedName
 {
@@ -63,7 +64,19 @@ namespace UsedName
 
         public void Initialize()
         {
-
+            if (string.IsNullOrEmpty(this.Language))
+            {
+                this.Language = Service.ClientState.ClientLanguage switch
+                {
+                    ClientLanguage.English => "en",
+                    ClientLanguage.Japanese => "en",
+                    ClientLanguage.French => "en",
+                    ClientLanguage.German => "en",
+                    // ClientLanguage.ChineseSimplified only exist in CN ver of dalamud
+                    // ClientLanguage.ChineseSimplified => "zh_CN",
+                    _ => "zh_CN",
+                };
+            }
             if (String.IsNullOrEmpty(storeNamesPath))
             {
                 var path = Service.PluginInterface.ConfigDirectory;

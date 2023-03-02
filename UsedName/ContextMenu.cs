@@ -8,10 +8,8 @@ namespace UsedName;
 
 public class ContextMenu : IDisposable
 {
-    private readonly UsedName plugin;
-    public ContextMenu(UsedName Plugin)
+    public ContextMenu()
     {
-        this.plugin = Plugin;
         Enable();
     }
 
@@ -78,8 +76,8 @@ public class ContextMenu : IDisposable
         {
             return;
         }
-        Service.TempPlayerName = args.Text.ToString();
-        plugin.DrawEdittingUI();
+        Service.PlayersNamesManager.TempPlayerName = args.Text.ToString();
+        Service.ConfigWindow.IsOpen= true;
     }
 
     private void Search(GameObjectContextMenuItemSelectedArgs args)
@@ -89,7 +87,7 @@ public class ContextMenu : IDisposable
         var target = args.Text.ToString();
         if (!string.IsNullOrEmpty(target))
         {
-            plugin.SearchPlayerResult(args.Text.ToString());
+            Service.PlayersNamesManager.SearchPlayerResult(args.Text.ToString());
         }
         else
         {

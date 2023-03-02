@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
+using Dalamud;
 
 namespace UsedName
 {
     class Localization
     {
-        internal string currentLanguage = "en";
+        internal string currentLanguage;
         private Dictionary<string, string> languageDict = new() { };
-        public Localization(string language = "en")
+        public Localization()
         {
-            currentLanguage = language;
-            this.LoadLanguage(language);
+            currentLanguage = Service.Configuration.Language;
+            this.LoadLanguage(currentLanguage);
         }
 
         public string Localize(string message)
@@ -27,7 +28,7 @@ namespace UsedName
 #endif
             return message;
         }
-        internal void LoadLanguage(string language = "en")
+        internal void LoadLanguage(string language)
         {
             this.currentLanguage = language;
             if (language == "en") return;

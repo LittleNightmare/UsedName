@@ -13,22 +13,24 @@ using XivCommon;
 using Dalamud.ContextMenu;
 using Dalamud.Hooking;
 using System;
+using UsedName.GUI;
+using UsedName.Manager;
+using UsedName.GUI;
 
 namespace UsedName
 {
     internal class Service
     {
         internal static Configuration Configuration { get; set; } = null!;
-        internal static PluginUI PluginUi { get; set; } = null!;
+        internal static Commands Commands { get; set; } = null!;
+        internal static GameDataManager GameDataManager { get; set; } = null!;
+        internal static PlayersNamesManager PlayersNamesManager { get; set; } = null!;
+        internal static MainWindow MainWindow { get; set; } = null!;
+        internal static ConfigWindow ConfigWindow { get; set; } = null!;
+        internal static EditingWindow EditingWindow { get; set; } = null!;
         internal static XivCommonBase Common { get; set; } = null!;
         internal static DalamudContextMenu ContextMenu { get; set; } = null!;
-        internal static ContextMenu ContextMenuManager { get; set; } = null!;
-        internal static string? TempPlayerName;
-        internal static ulong TempPlayerID;
         internal static Localization Loc { get; set; } = null!;
-
-        internal unsafe delegate void GetSocialListDelegate(uint targetId, IntPtr SocialList);
-        internal static Hook<GetSocialListDelegate> GetSocialListHook { get; set; } = null!;
 
         [PluginService]
         internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;

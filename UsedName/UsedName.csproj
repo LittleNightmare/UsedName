@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>LittleNightmare</Authors>
     <Company></Company>
-    <Version>0.8.1.0</Version>
+    <Version>0.8.1.1</Version>
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
@@ -39,6 +39,9 @@
   <PropertyGroup Condition="'$(IsBuildForCN)' == 'true'">
 	<DalamudLibPath>F:\ffxiv\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Manager\GameDataManage.cs~RF3029c7d.TMP" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\images\icon.png">
