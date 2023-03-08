@@ -2,6 +2,7 @@
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -131,6 +132,45 @@ namespace UsedName.GUI
                 if (ImGui.InputText("##AddNickNameString", ref Service.Configuration.AddNickNameString, 15))
                 {
                     Service.Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+            if(ImGui.Checkbox(Service.Loc.Localize("Modify Store Path"), ref Service.Configuration.modifyStorePath))
+            {
+                Service.Configuration.Save();
+            }
+            if (Service.Configuration.modifyStorePath)
+            {
+                ImGui.Spacing();
+                ImGui.Indent();
+                ImGui.TextUnformatted(Service.Loc.Localize("Store Path:"));
+                ImGui.SameLine();
+                var storePath = Service.Configuration.storeNamesPath;
+                if (ImGui.InputText("##StorePath", ref storePath, 260))
+                {
+                    if (storePath != Service.Configuration.storeNamesPath &&
+                        Directory.Exists(Path.GetDirectoryName(storePath)))
+                    {
+                        Service.Configuration.storeNamesPath = storePath;
+                        Service.Configuration.Save(true);
+                    }
+                    else
+                    {
+                        storePath = Service.Configuration.storeNamesPath;
+                    }
+                }
+                ImGui.SameLine();
+                if (ImGui.Button(Service.Loc.Localize("Reset Path")))
+                {
+                    var path = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
+                    if (!Directory.Exists(Path.GetDirectoryName(path)))
+                    {
+                        Service.PluginInterface.ConfigDirectory.Create();
+                    }
+                    Service.Configuration.storeNamesPath = path;
+                    Service.Configuration.modifyStorePath = false;
+                    Service.Configuration.Save(true);
+
                 }
                 ImGui.Unindent();
             }

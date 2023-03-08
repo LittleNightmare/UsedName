@@ -47,5 +47,9 @@
     "Edit": "编辑",
     "Remove": "移除",
     "Show": "显示",
-    "Setting": "设置"
+    "Setting": "设置",
+    "Modify Store Path": "更改储存路径",
+    "Store Path:": "储存路径:",
+    "Reset Path": "重置路径",
+    "You modify path of storeNames.json, but there is other storeNames.json at orginal path\nPlease, delete one that you don't want to use after game close\n": "你修改了储存路径，但在默认路径仍有一个storeNNames.json\n请在关闭游戏后，删除一个你不想使用的"
 }

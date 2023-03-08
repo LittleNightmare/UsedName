@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Linq;
 using Dalamud;
+using Dalamud.Logging;
 
 namespace UsedName
 {
@@ -33,6 +34,7 @@ namespace UsedName
         public bool UpdateFromFriendList = true;
         public bool UpdateFromPlayerSearch = false;
 
+        
         public class PlayersNames
         {
             public string currentName { get; set; }
@@ -57,6 +59,7 @@ namespace UsedName
             set { playersNameList = value; }
         }
 
+        public bool modifyStorePath = false;
         public string storeNamesPath = String.Empty;
 
 
@@ -77,21 +80,34 @@ namespace UsedName
                     _ => "zh_CN",
                 };
             }
+            var path = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
             if (String.IsNullOrEmpty(storeNamesPath))
             {
-                var path = Service.PluginInterface.ConfigDirectory;
-                path.Create();
-                storeNamesPath = Path.Join(path.FullName, "storeNames.json");
+                Service.PluginInterface.ConfigDirectory.Create();
+                storeNamesPath = path;
             }
             
             // if not exist, it means old version config. The old playerNameList would load. Just save it.
             if (File.Exists(storeNamesPath))
             {
+                if (modifyStorePath)
+                {
+                    
+                    if (File.Exists(path) && !path.Equals(storeNamesPath))
+                    {
+                        var hint = Service.Loc.Localize("You modify path of storeNames.json, but there is other storeNames.json at orginal path\n" +
+                            "Please, delete one that you don't want to use after game close\n") + 
+                            $"Your Path(Current Loading): {storeNamesPath}\nOrginal Path:{path}";
+                        PluginLog.Warning(hint);
+                        Service.Chat.PrintError(hint);
+                    }
+                }   
                 LoadStoreName();
-            }else if (File.Exists(Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json")))
+            }
+            else if (File.Exists(path) && !modifyStorePath)
             {
                 // it may happen when user move the config file to another place.
-                storeNamesPath = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
+                storeNamesPath = path;
                 LoadStoreName();
             }
             Save(storeName: true);
