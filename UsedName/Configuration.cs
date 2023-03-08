@@ -83,27 +83,40 @@ namespace UsedName
                 path.Create();
                 storeNamesPath = Path.Join(path.FullName, "storeNames.json");
             }
-
+            
+            // if not exist, it means old version config. The old playerNameList would load. Just save it.
             if (File.Exists(storeNamesPath))
             {
-                using (StreamReader r = new StreamReader(storeNamesPath))
+                LoadStoreName();
+            }else if (File.Exists(Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json")))
+            {
+                // it may happen when user move the config file to another place.
+                storeNamesPath = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
+                LoadStoreName();
+            }
+            Save(storeName: true);
+        }
+
+        private void LoadStoreName()
+        {
+            using (StreamReader r = new StreamReader(storeNamesPath))
+            {
+                string json = r.ReadToEnd();
+                // init load playersNameList would be empty. it is ok, just load here
+                if (playersNameList.Equals(new Dictionary<ulong, PlayersNames>()))
                 {
-                    string json = r.ReadToEnd();
-                    if (playersNameList.Equals(new Dictionary<ulong, PlayersNames>()))
+                    playersNameList = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
+                }
+                else
+                {
+                    // not empty means playerNameList not only contain in old config, but also new config. So, merge them. 
+                    var temp = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
+                    if (temp != null && !temp.Equals((new Dictionary<ulong, PlayersNames>())))
                     {
-                        playersNameList = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
-                    }
-                    else
-                    {
-                        var temp = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, PlayersNames>>(json);
-                        if(temp != null&& !temp.Equals((new Dictionary<ulong, PlayersNames>())))
-                        {
-                            playersNameList = mergePlayerList(playersNameList, temp);
-                        }
+                        playersNameList = mergePlayerList(playersNameList, temp);
                     }
                 }
             }
-            Save(storeName: true);
         }
 
         public void Save(bool storeName = false)
