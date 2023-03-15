@@ -37,7 +37,7 @@ namespace UsedName.Manager
         }
         private readonly string[] KnowType = { "1", "2", "3", "4", "5", "6", "7", "10", "11" };
         private readonly string[] AcceptType = { "1", "2", "4" };
-        private unsafe void GetSocialListDetour(uint targetId, IntPtr data)
+        private void GetSocialListDetour(uint targetId, IntPtr data)
         {
             var socialList = Marshal.PtrToStructure<SocialListResult>(data);
             this.GetSocialListHook?.Original(targetId, data);
@@ -57,12 +57,13 @@ namespace UsedName.Manager
             }
 
 
-            if ((listType == "1" && !Service.Configuration.UpdateFromPartyList) ||
-                (listType == "2" && !Service.Configuration.UpdateFromFriendList) ||
-                (listType == "4" && !Service.Configuration.UpdateFromPlayerSearch) ||
-                !AcceptType.Contains(listType))
+            switch (listType)
             {
-                return;
+                case "1" when !Service.Configuration.UpdateFromPartyList:
+                case "2" when !Service.Configuration.UpdateFromFriendList:
+                case "4" when !Service.Configuration.UpdateFromPlayerSearch:
+                case var _ when !AcceptType.Contains(listType):
+                    return;
             }
             var result = new Dictionary<ulong, string>();
             foreach (var c in socialList.CharacterEntries)
@@ -82,11 +83,16 @@ namespace UsedName.Manager
 
         internal void GetDataFromXivCommon()
         {
-            var friendList = Service.Common.Functions.FriendList.List.GetEnumerator();
-            IDictionary<ulong, string> currentPlayersList = new Dictionary<ulong, string>();
-            while (friendList.MoveNext())
+            var friendList = Service.Common.Functions.FriendList.List;
+            if (friendList.Count <= 0)
             {
-                var player = friendList.Current;
+                return;
+            }
+            var friendListEnumerator = Service.Common.Functions.FriendList.List.GetEnumerator();
+            IDictionary<ulong, string> currentPlayersList = new Dictionary<ulong, string>();
+            while (friendListEnumerator.MoveNext())
+            {
+                var player = friendListEnumerator.Current;
                 var contentId = player.ContentId;
                 var name = player.Name.ToString();
                 try

@@ -69,12 +69,13 @@ namespace UsedName.Manager
 
         public string SearchPlayerResult(string targetName)
         {
-            string result = "";
+            StringBuilder resultBuilder = new StringBuilder();
             foreach (var player in SearchPlayer(targetName, true))
             {
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
-                result += $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n";
+                resultBuilder.Append( $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n");
             }
+            string result = resultBuilder.ToString();
             Service.Chat.Print(string.Format(Service.Loc.Localize("Search result(s) for target [{0}]:"), targetName) + $"\n{result}");
             return result;
         }
