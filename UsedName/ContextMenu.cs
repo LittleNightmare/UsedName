@@ -77,7 +77,7 @@ public class ContextMenu : IDisposable
             return;
         }
         Service.PlayersNamesManager.TempPlayerName = args.Text.ToString();
-        Service.ConfigWindow.IsOpen= true;
+        Service.EditingWindow.IsOpen= true;
     }
 
     private void Search(GameObjectContextMenuItemSelectedArgs args)

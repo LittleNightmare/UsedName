@@ -32,6 +32,8 @@ public class MainWindow : Window, IDisposable
         "CurrentName","NickName","FirstUsedName","ShowMoreUsedName","Edit","Remove"
     };
 
+    private string searchContent = "";
+
     public override void Draw()
     {
         if (ImGui.Button(Service.Loc.Localize("Setting")))
@@ -42,10 +44,9 @@ public class MainWindow : Window, IDisposable
         ImGui.Text(Service.Loc.Localize("Search:"));
         ImGui.SameLine();
         ImGui.SetNextItemWidth(200);
-        var searchContent = "";
-        ImGui.InputTextWithHint("", Service.Loc.Localize("Enter player's name here"), ref searchContent, 250);
+        ImGui.InputTextWithHint("##searchContent", Service.Loc.Localize("Enter player's name here"), ref searchContent, 250);
 
-        if (ImGui.BeginTable("SocialList", TableColum.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
+        if (ImGui.BeginTable($"SocialList##{searchContent}", TableColum.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
         {
             foreach (var t in TableColum)
             {
