@@ -15,7 +15,6 @@ using Dalamud.Hooking;
 using System;
 using UsedName.GUI;
 using UsedName.Manager;
-using UsedName.GUI;
 
 namespace UsedName
 {

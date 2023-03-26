@@ -139,12 +139,12 @@ namespace UsedName
         {
             if (storeName)
             {
-                storeNames();
+                StoreNames();
             }           
             Service.PluginInterface!.SavePluginConfig(this);
         }
 
-        public void storeNames()
+        public void StoreNames()
         {
             string jsonString = System.Text.Json.JsonSerializer.Serialize(playersNameList, new JsonSerializerOptions() { WriteIndented = true, Encoder= JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
             using (StreamWriter outputFile = new StreamWriter(storeNamesPath, false, System.Text.Encoding.UTF8))

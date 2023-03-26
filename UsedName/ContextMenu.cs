@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Dalamud.ContextMenu;
+using Dalamud.Game.Text.SeStringHandling;
 using UsedName;
 using Lumina.Excel.GeneratedSheets;
 
@@ -76,7 +77,7 @@ public class ContextMenu : IDisposable
         {
             return;
         }
-        Service.PlayersNamesManager.TempPlayerName = args.Text.ToString();
+        Service.PlayersNamesManager.TempPlayerName = (args.Text ?? new SeString()).ToString();
         Service.EditingWindow.IsOpen= true;
     }
 
@@ -84,10 +85,10 @@ public class ContextMenu : IDisposable
     {
         if (!IsMenuValid(args))
             return;
-        var target = args.Text.ToString();
+        var target = (args.Text ?? new SeString()).ToString(); ;
         if (!string.IsNullOrEmpty(target))
         {
-            Service.PlayersNamesManager.SearchPlayerResult(args.Text.ToString());
+            Service.PlayersNamesManager.SearchPlayerResult(target);
         }
         else
         {

@@ -43,7 +43,7 @@ namespace UsedName.Manager
             if (!same)
             {
                 Service.Configuration.playersNameList = savedFriendList;
-                Service.Configuration.storeNames();
+                Service.Configuration.StoreNames();
             }
             if (showHint)
             {
@@ -94,7 +94,7 @@ namespace UsedName.Manager
                 return;
             }
             Service.Configuration.playersNameList[player.First().Key].nickName = nickName;
-            Service.Configuration.storeNames();
+            Service.Configuration.StoreNames();
             Service.Chat.Print(string.Format(Service.Loc.Localize("The nickname of {0} has been set to {1}"), playerName, nickName));
         }
 
@@ -103,7 +103,7 @@ namespace UsedName.Manager
         {
             Service.Chat.Print(string.Format(Service.Loc.Localize("Remove player {0} from list"), Service.Configuration.playersNameList[id].currentName));
             Service.Configuration.playersNameList.Remove(id);
-            Service.Configuration.storeNames();
+            Service.Configuration.StoreNames();
         }
     }
 }

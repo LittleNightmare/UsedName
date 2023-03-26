@@ -40,7 +40,7 @@ public class EditingWindow : Window, IDisposable
             if (ImGui.InputText("##CurrentNickName", ref nickName, 250))
             {
                 Service.Configuration.playersNameList[targetID].nickName = nickName;
-                Service.Configuration.storeNames();
+                Service.Configuration.StoreNames();
             }
         }
         else

@@ -27,7 +27,7 @@ public class MainWindow : Window, IDisposable
     {
         GC.SuppressFinalize(this);
     }
-    private string[] TableColum = new string[]
+    private readonly string[] TableColum = new string[]
     {
         "CurrentName","NickName","FirstUsedName","ShowMoreUsedName","Edit","Remove"
     };
@@ -55,9 +55,11 @@ public class MainWindow : Window, IDisposable
             }
             ImGui.TableHeadersRow();
             var index = 0;
-            foreach (var (id, player) in Service.Configuration.playersNameList.Where(item => item.Value.currentName.Contains(searchContent) ||
-                                                                                            item.Value.nickName.Contains(searchContent) ||
-                                                                                            item.Value.usedNames.Any(u => u.Contains(searchContent))))
+            //TODO: not case sensitive
+            foreach (var (id, player) in Service.Configuration.playersNameList.Where(item =>
+                         item.Value.currentName.Contains(searchContent) ||
+                         item.Value.nickName.Contains(searchContent) ||
+                         item.Value.usedNames.Any(u => u.Contains(searchContent))))
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
