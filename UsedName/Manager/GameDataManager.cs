@@ -35,23 +35,34 @@ namespace UsedName.Manager
             this.GetSocialListHook?.Disable();
             this.GetSocialListHook?.Dispose();
         }
-        private readonly string[] KnowType = { "1", "2", "3", "4", "5", "6", "7", "10", "11" };
-        private readonly string[] AcceptType = { "1", "2", "4" };
+
+        internal readonly List<ListType> AcceptType = new()
+        {
+            ListType.PartyList,
+            ListType.FriendList,
+            ListType.PlayerSearch
+        };
         private void GetSocialListDetour(uint targetId, IntPtr data)
         {
             var socialList = Marshal.PtrToStructure<SocialListResult>(data);
             this.GetSocialListHook?.Original(targetId, data);
-            string listType = socialList.ListType.ToString();
+            var listType = socialList.ListType;
             PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}:{socialList.Index}:{socialList.NextIndex}:{socialList.RequestKey}:{socialList.RequestParam}");
-            PluginLog.Debug($"ListType:{socialList.ListType:X}");
+            PluginLog.Debug($"ListType:{socialList.ListTypeByte:X}");
             // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
             // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
             // 10 = Mentor;11 = New Adventurer/Returner; 
 
-            if (!KnowType.Contains(listType))
+            if (listType is null)
             {
 #if DEBUG
-                Service.Chat.Print($"UsedName: Find Unknown type: {listType}");
+                var hint = $"UsedName: Find Unknown type: {socialList.ListTypeByte}";
+                Service.Chat.Print(hint);
+                foreach (var character in socialList.CharacterEntries)
+                {
+                    hint += $"\n{character.CharacterID:X}:{character.CharacterName}";
+                }
+                PluginLog.Warning(hint);
 #endif
                 return;
             }
@@ -59,10 +70,11 @@ namespace UsedName.Manager
 
             switch (listType)
             {
-                case "1" when !Service.Configuration.UpdateFromPartyList:
-                case "2" when !Service.Configuration.UpdateFromFriendList:
-                case "4" when !Service.Configuration.UpdateFromPlayerSearch:
-                case var _ when !AcceptType.Contains(listType):
+                case ListType.PartyList when !Service.Configuration.UpdateFromPartyList:
+                case ListType.FriendList when !Service.Configuration.UpdateFromFriendList:
+                case ListType.PlayerSearch when !Service.Configuration.UpdateFromPlayerSearch:
+                    return;
+                case var _ when !AcceptType.Contains((ListType)listType):
                     return;
             }
             var result = new Dictionary<ulong, string>();

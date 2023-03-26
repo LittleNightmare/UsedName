@@ -15,7 +15,18 @@ using System.Threading.Tasks;
 
 namespace UsedName.Structs;
 
-
+public enum ListType : byte
+{
+    PartyList = 1,
+    FriendList = 2,
+    LinkShell = 3,
+    PlayerSearch = 4,
+    MembersOnline = 5,
+    CompanyMember = 6,
+    ApplicationOfCompany = 7,
+    Mentor = 10,
+    NewAdventurer = 11
+}
 
 [StructLayout(LayoutKind.Sequential, Size = 0x380)]
 public unsafe struct SocialListResult
@@ -23,12 +34,25 @@ public unsafe struct SocialListResult
     public ulong CommunityID;
     public ushort NextIndex;
     public ushort Index;
-    public byte ListType;
+    public byte ListTypeByte;
     public byte RequestKey;
     public byte RequestParam;
     private byte __padding1;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
     public CharacterEntry[] CharacterEntries;
+
+    public ListType? ListType
+    {
+        get
+        {
+            if (Enum.IsDefined(typeof(ListType), ListTypeByte))
+            {
+                return (ListType)ListTypeByte;
+            }
+            return null;
+        }
+        set {}
+    }
 }
 [StructLayout(LayoutKind.Explicit, Size = 0x58, Pack = 1)]
 public unsafe struct CharacterEntry
@@ -76,7 +100,7 @@ public unsafe struct CharacterEntry
 
     public ExcelResolver<ClassJob> CurrntClassJob => new(this.CurrentClassID);
     public ExcelResolver<ContentFinderCondition> ContentFinderCondition => new(this.ContentFinderConditionID);
-    public ExcelResolver<TerritoryType> TerritoryType
+    public ExcelResolver<TerritoryType>? TerritoryType
     {
         get
         {
