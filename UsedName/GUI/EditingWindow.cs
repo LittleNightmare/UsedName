@@ -49,7 +49,7 @@ public class EditingWindow : Window, IDisposable
             ImGui.Spacing();
             if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
             {
-                Service.GameDataManager.GetDataFromXivCommon();
+                Service.GameDataManager.UpdateDataFromXivCommon();
             }
         }
     }

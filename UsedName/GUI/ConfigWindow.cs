@@ -31,12 +31,17 @@ namespace UsedName.GUI
         {
             if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
             {
-                Service.GameDataManager.GetDataFromXivCommon();
+                Service.GameDataManager.UpdateDataFromXivCommon();
             }
             ImGui.SameLine();
             if (ImGui.Button(Service.Loc.Localize("Open Main Window")))
             {
                 Service.MainWindow.Toggle();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button(Service.Loc.Localize("Open Subscription Window")))
+            {
+                Service.SubscriptionWindow.Toggle();
             }
             ImGui.Spacing();
             ImGui.Text(Service.Loc.Localize("Language:"));
@@ -86,9 +91,29 @@ namespace UsedName.GUI
                 {
                     Service.Configuration.Save();
                 }
-                if (ImGui.Checkbox(Service.Loc.Localize("Update From PlayerSearch"), ref Service.Configuration.UpdateFromPlayerSearch))
+                if (ImGui.Checkbox(Service.Loc.Localize("Update From CompanyMember"), ref Service.Configuration.UpdateFromCompanyMember))
                 {
                     Service.Configuration.Save();
+                }
+                if (ImGui.Checkbox(Service.Loc.Localize("Enable Subscription"), ref Service.Configuration.EnableSubscription))
+                {
+                    Service.Configuration.Save();
+                }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(Service.Loc.Localize("Automatically adding subscribed players to the stored player list,\n and clearing it every time the plugin is closed."));
+                }
+                if (Service.Configuration.EnableSubscription)
+                {
+                    ImGui.Spacing();
+                    ImGui.Indent();
+                    ImGui.TextUnformatted(Service.Loc.Localize("Subscription String"));
+                    ImGui.SameLine();
+                    if (ImGui.InputText("##SubscriptionString", ref Service.Configuration.SubscriptionString, 15))
+                    {
+                        Service.Configuration.Save();
+                    }
+                    ImGui.Unindent();
                 }
                 ImGui.Unindent();
             }

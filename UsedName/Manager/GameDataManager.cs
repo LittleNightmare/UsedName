@@ -27,7 +27,7 @@ namespace UsedName.Manager
             // first time
             if (Service.Configuration.playersNameList.Count <= 0)
             {
-                this.GetDataFromXivCommon();
+                this.UpdateDataFromXivCommon();
             }
         }
         public void Dispose()
@@ -40,7 +40,7 @@ namespace UsedName.Manager
         {
             ListType.PartyList,
             ListType.FriendList,
-            ListType.PlayerSearch
+            ListType.CompanyMember
         };
         private void GetSocialListDetour(uint targetId, IntPtr data)
         {
@@ -72,33 +72,44 @@ namespace UsedName.Manager
             {
                 case ListType.PartyList when !Service.Configuration.UpdateFromPartyList:
                 case ListType.FriendList when !Service.Configuration.UpdateFromFriendList:
-                case ListType.PlayerSearch when !Service.Configuration.UpdateFromPlayerSearch:
-                    return;
-                case var _ when !AcceptType.Contains((ListType)listType):
+                case ListType.CompanyMember when !Service.Configuration.UpdateFromCompanyMember:
+                case var _ when !AcceptType.Contains((ListType)listType) && !Service.Configuration.EnableSubscription:
                     return;
             }
             var result = new Dictionary<ulong, string>();
+            var notInGameFriendListFriend = Service.PlayersNamesManager.NotInGameFriendListFriend();
+            var subList = Service.PlayersNamesManager.Subscriptions;
             foreach (var c in socialList.CharacterEntries)
             {
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||
                     c.CharacterName.IsNullOrEmpty())
                     continue;
-                if (!result.TryAdd(c.CharacterID, c.CharacterName))
+                if (AcceptType.Contains((ListType)listType) ||
+                    (Service.Configuration.EnableSubscription &&
+                                        (subList.RemoveAll(x => x == c.CharacterName)>0 || 
+                                         notInGameFriendListFriend.Exists(id => id == c.CharacterID))))
                 {
-                    PluginLog.LogWarning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
+                    if (!result.TryAdd(c.CharacterID, c.CharacterName))
+                    {
+                        PluginLog.LogWarning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
+                    }
                 }
+
             }
+            Service.PlayersNamesManager.Subscriptions = subList;
+            if (result.Count <= 0)
+                return;
             Service.PlayersNamesManager.UpdatePlayerNames(result, false);
 
         }
 
-        internal void GetDataFromXivCommon()
+        internal IDictionary<ulong, string>? GetDataFromXivCommon()
         {
             var friendList = Service.Common.Functions.FriendList.List;
             if (friendList.Count <= 0)
             {
-                return;
+                return null;
             }
             var friendListEnumerator = Service.Common.Functions.FriendList.List.GetEnumerator();
             IDictionary<ulong, string> currentPlayersList = new Dictionary<ulong, string>();
@@ -116,11 +127,17 @@ namespace UsedName.Manager
                     PluginLog.Warning($"{e}");
                     PluginLog.Warning($"Unknown problem at {name}-{contentId}");
                     Service.Chat.PrintError(Service.Loc.Localize($"Update Player List Fail\nMay cause by incompatible version of XivCommon\nPlease contact to developer"));
-                    return;
+                    return null;
                 }
 
             }
-            Service.PlayersNamesManager.UpdatePlayerNames(currentPlayersList);
+            return currentPlayersList;
+        }
+        internal void UpdateDataFromXivCommon()
+        {
+            var currentPlayersList = GetDataFromXivCommon();
+            if(currentPlayersList != null)
+                Service.PlayersNamesManager.UpdatePlayerNames(currentPlayersList);
         }
 
         public XivCommon.Functions.FriendList.FriendListEntry GetPlayerByNameFromFriendList(string name)

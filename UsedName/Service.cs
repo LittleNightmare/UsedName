@@ -27,6 +27,7 @@ namespace UsedName
         internal static MainWindow MainWindow { get; set; } = null!;
         internal static ConfigWindow ConfigWindow { get; set; } = null!;
         internal static EditingWindow EditingWindow { get; set; } = null!;
+        internal static SubscriptionWindow SubscriptionWindow { get; set; } = null!;
         internal static XivCommonBase Common { get; set; } = null!;
         internal static DalamudContextMenu ContextMenu { get; set; } = null!;
         internal static Localization Loc { get; set; } = null!;
@@ -45,6 +46,5 @@ namespace UsedName
         internal static CommandManager CommandManager { get; private set; } = null!;
         [PluginService]
         internal static GameNetwork Network { get; private set; } = null!;
-        
     }
 }

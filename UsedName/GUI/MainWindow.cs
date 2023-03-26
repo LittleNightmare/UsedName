@@ -32,7 +32,7 @@ public class MainWindow : Window, IDisposable
         "CurrentName","NickName","FirstUsedName","ShowMoreUsedName","Edit","Remove"
     };
 
-    private string searchContent = "";
+    private string _searchContent = "";
 
     public override void Draw()
     {
@@ -44,9 +44,9 @@ public class MainWindow : Window, IDisposable
         ImGui.Text(Service.Loc.Localize("Search:"));
         ImGui.SameLine();
         ImGui.SetNextItemWidth(200);
-        ImGui.InputTextWithHint("##searchContent", Service.Loc.Localize("Enter player's name here"), ref searchContent, 250);
+        ImGui.InputTextWithHint("##searchContent", Service.Loc.Localize("Enter player's name here"), ref _searchContent, 250);
 
-        if (ImGui.BeginTable($"SocialList##{searchContent}", TableColum.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
+        if (ImGui.BeginTable($"SocialList##{_searchContent}", TableColum.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
         {
             foreach (var t in TableColum)
             {
@@ -56,10 +56,7 @@ public class MainWindow : Window, IDisposable
             ImGui.TableHeadersRow();
             var index = 0;
             //TODO: not case sensitive
-            foreach (var (id, player) in Service.Configuration.playersNameList.Where(item =>
-                         item.Value.currentName.Contains(searchContent) ||
-                         item.Value.nickName.Contains(searchContent) ||
-                         item.Value.usedNames.Any(u => u.Contains(searchContent))))
+            foreach (var (id, player) in Service.PlayersNamesManager.SearchPlayer(_searchContent,true,false))
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
@@ -67,8 +64,7 @@ public class MainWindow : Window, IDisposable
                 ImGui.TableNextColumn();
                 ImGui.Text(player.nickName);
                 ImGui.TableNextColumn();
-                var firstUsedName = player.usedNames.Where(n => !n.IsNullOrEmpty()).ToList().Count >= 1 ? player.usedNames.Where(n => !n.IsNullOrEmpty()).First() : "";
-                ImGui.Text(firstUsedName);
+                ImGui.Text(player.firstUsedname);
                 ImGui.TableNextColumn();
                 if (ImGui.Button(Service.Loc.Localize("Show") + $"##{index}"))
                 {

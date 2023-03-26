@@ -44,10 +44,12 @@ namespace UsedName
             Service.MainWindow = new MainWindow();
             Service.ConfigWindow = new ConfigWindow();
             Service.EditingWindow = new EditingWindow();
+            Service.SubscriptionWindow = new SubscriptionWindow();
             this.windowSystem= new WindowSystem("UsedName");
             this.windowSystem.AddWindow(Service.MainWindow);
             this.windowSystem.AddWindow(Service.ConfigWindow);
             this.windowSystem.AddWindow(Service.EditingWindow);
+            this.windowSystem.AddWindow(Service.SubscriptionWindow);
             
             Service.PluginInterface.UiBuilder.Draw += this.windowSystem.Draw;
             Service.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;

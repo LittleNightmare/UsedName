@@ -64,27 +64,41 @@ public class ContextMenu : IDisposable
         {
             args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SearchString, Search, true));
         }
-        
+
+        var playerName = (args.Text ?? new SeString()).ToString();
+        var playerInPluginFriendList = Service.PlayersNamesManager.SearchPlayer(playerName).Count >= 1;
         if (Service.Configuration.EnableAddNickName)
         {
             args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.AddNickNameString, AddNickName, true));
+        }
+
+        if (Service.Configuration.EnableSubscription && !playerInPluginFriendList && !Service.PlayersNamesManager.Subscriptions.Exists(x => x==playerName))
+        {
+            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SubscriptionString, AddSubscription, true));
         }
     }
 
     private void AddNickName(GameObjectContextMenuItemSelectedArgs args)
     {
-        if (!IsMenuValid(args))
-        {
-            return;
-        }
         Service.PlayersNamesManager.TempPlayerName = (args.Text ?? new SeString()).ToString();
         Service.EditingWindow.IsOpen= true;
     }
 
+    private void AddSubscription(GameObjectContextMenuItemSelectedArgs args)
+    {
+        var world = Service.DataManager.GetExcelSheet<World>()?.FirstOrDefault(x => x.RowId == args.ObjectWorld);
+        if (world == null)
+            return;
+        var playerName = (args.Text ?? new SeString()).ToString();
+        if (string.IsNullOrEmpty(playerName))
+            return;
+        Service.PlayersNamesManager.Subscriptions.Add(playerName);
+        Service.PlayersNamesManager.Subscriptions.Sort();
+        Service.Chat.Print(String.Format(Service.Loc.Localize("Added {0} to subscription list"),playerName));
+    }
+
     private void Search(GameObjectContextMenuItemSelectedArgs args)
     {
-        if (!IsMenuValid(args))
-            return;
         var target = (args.Text ?? new SeString()).ToString(); ;
         if (!string.IsNullOrEmpty(target))
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,18 @@ namespace UsedName.Manager
     {
         internal string? TempPlayerName;
         internal ulong TempPlayerID;
+
+        public List<string> Subscriptions = new List<string>();
+
+        public List<ulong> NotInGameFriendListFriend()
+        {
+            var currentFriendList = Service.GameDataManager.GetDataFromXivCommon();
+            if (currentFriendList == null) return new List<ulong>();
+            var currentFriendListIDs = currentFriendList.Keys;
+            var savedFriendListIDs = Service.Configuration.playersNameList.Keys;
+            return savedFriendListIDs.Except(currentFriendListIDs).ToList();
+        }
+        
         public void UpdatePlayerNames(IDictionary<ulong, string> currentPlayersList, bool showHint = true)
         {
             var savedFriendList = Service.Configuration.playersNameList;
@@ -51,15 +64,25 @@ namespace UsedName.Manager
             }
         }
 
-        public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName = false)
+        public IDictionary<ulong, Configuration.PlayersNames> SearchPlayer(string targetName, bool useNickName = false, bool strictCompare = true)
         {
             var result = new Dictionary<ulong, Configuration.PlayersNames>();
             targetName = targetName.ToLower();
+            bool Compare(string fullname, string nickName, List<string> usedNames)
+            {
+                if (strictCompare)
+                {
+                    return fullname.Equals(targetName) || (useNickName && nickName.Equals(targetName)) ||
+                           usedNames.Any(name => name.Equals(targetName));
+                }
+                return fullname.Contains(targetName) || (useNickName && nickName.ToLower().Contains(targetName)) ||
+                       usedNames.Any(name => name.Contains(targetName));
+            }
             foreach (var player in Service.Configuration.playersNameList)
             {
                 var current = player.Value.currentName.ToLower();
-                var nickNmae = player.Value.nickName.ToLower();
-                if (current.Equals(targetName) || (useNickName && nickNmae.ToLower().Equals(targetName)) || player.Value.usedNames.Any(name => name.Equals(targetName)))
+                var nickName = player.Value.nickName.ToLower();
+                if (Compare(current, nickName, player.Value.usedNames))
                 {
                     result.Add(player.Key, player.Value);
                 }
@@ -70,7 +93,7 @@ namespace UsedName.Manager
         public string SearchPlayerResult(string targetName)
         {
             StringBuilder resultBuilder = new StringBuilder();
-            foreach (var player in SearchPlayer(targetName, true))
+            foreach (var player in SearchPlayer(targetName, true,false))
             {
                 var temp = string.IsNullOrEmpty(player.Value.nickName) ? "" : "(" + player.Value.nickName + ")";
                 resultBuilder.Append( $"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n");

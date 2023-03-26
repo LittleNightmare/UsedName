@@ -51,5 +51,12 @@
     "Modify Store Path": "更改储存路径",
     "Store Path:": "储存路径:",
     "Reset Path": "重置路径",
-    "You modify path of storeNames.json, but there is other storeNames.json at orginal path\nPlease, delete one that you don't want to use after game close\n": "你修改了储存路径，但在默认路径仍有一个storeNNames.json\n请在关闭游戏后，删除一个你不想使用的"
+    "You modify path of storeNames.json, but there is other storeNames.json at orginal path\nPlease, delete one that you don't want to use after game close\n": "你修改了储存路径，但在默认路径仍有一个storeNNames.json\n请在关闭游戏后，删除一个你不想使用的",
+    "Use '/pname sub' show plugin's Subscription window\n": "使用'/pname sub'打开订阅窗口\n",
+    "Open Subscription Window": "打开订阅窗口",
+    "Update From CompanyMember": "部队成员更新",
+    "Enable Subscription": "启动订阅功能",
+    "Subscription String": "订阅按钮",
+    "Automatically adding subscribed players to the stored player list,\n and clearing it every time the plugin is closed.": "自动添加订阅的玩家到储存的好友列表\n并在插件关闭时清除",
+    "Added {0} to subscription list": "添加 {0} 到订阅列表"
 }

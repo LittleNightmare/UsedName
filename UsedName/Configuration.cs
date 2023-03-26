@@ -11,13 +11,14 @@ using System.Text.Json;
 using System.Linq;
 using Dalamud;
 using Dalamud.Logging;
+using Dalamud.Utility;
 
 namespace UsedName
 {
     [Serializable]
     public class Configuration : IPluginConfiguration
     {
-        public int Version { get; set; } = 2;
+        public int Version { get; set; } = 3;
 
         public string? Language = null;
 
@@ -32,15 +33,26 @@ namespace UsedName
         public bool EnableAutoUpdate = false;
         public bool UpdateFromPartyList = false;
         public bool UpdateFromFriendList = true;
-        public bool UpdateFromPlayerSearch = false;
+        public bool UpdateFromCompanyMember = false;
 
-        
+
         public class PlayersNames
         {
             public string currentName { get; set; }
 
             public string nickName { get; set; }
             public List<string> usedNames { get; set; }
+
+            [JsonIgnore]
+            public string firstUsedname
+            {
+                get
+                {
+                    return this.usedNames.Where(n => !n.IsNullOrEmpty()).ToList().Count >= 1 ? this.usedNames.First(n => !n.IsNullOrEmpty()) : "";
+                }
+                set { }
+            }
+
             public PlayersNames(string CurrentName, string NickName, List<string> UsedNames)
             {
                 this.nickName = NickName;
@@ -58,6 +70,9 @@ namespace UsedName
             // get is intentionally omitted here
             set { playersNameList = value; }
         }
+
+        public bool EnableSubscription = false;
+        public string SubscriptionString = "Subscription";
 
         public bool modifyStorePath = false;
         public string storeNamesPath = String.Empty;
@@ -161,7 +176,7 @@ namespace UsedName
                 if (!result.ContainsKey(item.Key))
                 {
                     result.Add(item.Key, item.Value);
-                }else if(result[item.Key] == item.Value)
+                }else if(result[item.Key].Equals(item.Value))
                 {
                     continue;
                 }
