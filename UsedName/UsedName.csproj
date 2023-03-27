@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Platforms>x64</Platforms>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<IsBuildForCN>true</IsBuildForCN>
+	<IsBuildForCN>false</IsBuildForCN>
   </PropertyGroup>
   <PropertyGroup Condition="$(IsBuildForCN) != 'true'">
 	<DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
@@ -59,7 +59,7 @@
   </ItemGroup>
 	
   <ItemGroup Condition="$(IsBuildForCN)!='true'">
-    <PackageReference Include="DalamudPackager" Version="2.1.10" />
+    <PackageReference Include="DalamudPackager" Version="2.1.11" />
     <PackageReference Include="Dalamud.ContextMenu" Version="1.2.2" />
     <PackageReference Include="XivCommon" Version="7.0.0-alpha.1" />
   </ItemGroup>
