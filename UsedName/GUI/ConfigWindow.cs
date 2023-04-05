@@ -7,6 +7,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using UsedName.Structs;
 
 namespace UsedName.GUI
 {
@@ -75,9 +76,10 @@ namespace UsedName.GUI
                     Service.GameDataManager.GetSocialListHook?.Disable();
                 }
             }
+            var typeNames = Enum.GetNames(typeof(ListType)).Select(Service.Loc.Localize);
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip(Service.Loc.Localize("Automatically update the list of choices\nUpdate after opening the selected list\nThe option appears after checking"));
+                ImGui.SetTooltip(Service.Loc.Localize("Automatically record the checked social list.\nOptionally visible when checked.\nAnd automatically get updates\nwhen the following lists are opened.")+ "\n\n" + string.Join("\n",typeNames));
             }
             if (Service.Configuration.EnableAutoUpdate)
             {
@@ -101,7 +103,8 @@ namespace UsedName.GUI
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Automatically adding subscribed players to the stored player list,\n and clearing it every time the plugin is closed."));
+                    ImGui.SetTooltip(Service.Loc.Localize("Add a new subscription list.\nDuring updates, if a subscribed player's name exists,\nthis player will be added to the plugin's stored players'name list")+"\n"+
+                        Service.Loc.Localize("Players in the subscription list will be\nautomatically removed after successful capture of information\nor cleared when closing the game"));
                 }
                 if (Service.Configuration.EnableSubscription)
                 {
@@ -124,7 +127,7 @@ namespace UsedName.GUI
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip(Service.Loc.Localize("Show palyer who changed name when update FriendList"));
+                ImGui.SetTooltip(Service.Loc.Localize("Show player who changed name when update FriendList"));
             }
             if (ImGui.Checkbox(Service.Loc.Localize("Enable Search In Context"), ref Service.Configuration.EnableSearchInContext))
             {

@@ -6,6 +6,7 @@ using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -21,7 +22,8 @@ public enum ListType : byte
     FriendList = 2,
     LinkShell = 3,
     PlayerSearch = 4,
-    MembersOnline = 5,
+    [Display(ShortName = "MembersOnline")]
+    MembersOnlineAndOnHomeWorld = 5,
     CompanyMember = 6,
     ApplicationOfCompany = 7,
     Mentor = 10,
