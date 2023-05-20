@@ -95,34 +95,38 @@ namespace UsedName
                     _ => "zh_CN",
                 };
             }
-            var path = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
+            var defaultPath = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
             if (String.IsNullOrEmpty(storeNamesPath))
             {
                 Service.PluginInterface.ConfigDirectory.Create();
-                storeNamesPath = path;
+                storeNamesPath = defaultPath;
             }
-            
-            // if not exist, it means old version config. The old playerNameList would load. Just save it.
-            if (File.Exists(storeNamesPath))
+            // TODO cannot keep user data due to not completely move configs e.g. user only move UsedName.json not include storeNames.json
+            // Check path problem
+            if (!defaultPath.Equals(storeNamesPath))
             {
                 if (modifyStorePath)
                 {
-                    
-                    if (File.Exists(path) && !path.Equals(storeNamesPath))
+                    if (File.Exists(defaultPath) && File.Exists(storeNamesPath))
                     {
-                        var hint = Service.Loc.Localize("You modify path of storeNames.json, but there is other storeNames.json at orginal path\n" +
-                            "Please, delete one that you don't want to use after game close\n") + 
-                            $"Your Path(Current Loading): {storeNamesPath}\nOrginal Path:{path}";
+                        var hint = Service.Loc.Localize(
+                                       "You modify path of storeNames.json, but there is other storeNames.json at orginal path\n" + 
+                                       "Please, delete one that you don't want to use after game close\n") + 
+                                   $"Your Path(Current Loading): {storeNamesPath}\nOrginal Path:{defaultPath}";
                         PluginLog.Warning(hint);
                         Service.Chat.PrintError(hint);
                     }
-                }   
-                LoadStoreName();
+                }
+                else
+                {
+                    // it may happen when user move Dalamud to another place. assume as good user
+                    storeNamesPath = defaultPath;
+
+                }
             }
-            else if (File.Exists(path) && !modifyStorePath)
+            // if not exist, it means old version config. The old playerNameList would load. Just save it.
+            if (File.Exists(storeNamesPath))
             {
-                // it may happen when user move the config file to another place.
-                storeNamesPath = path;
                 LoadStoreName();
             }
             Save(storeName: true);
