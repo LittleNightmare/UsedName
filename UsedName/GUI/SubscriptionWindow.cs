@@ -28,21 +28,22 @@ public class SubscriptionWindow : Window, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private string _searchContent = "";
+    // private string _searchContent = "";
 
     public override void Draw()
     {
-        if (ImGui.BeginTable($"SocialList##{_searchContent}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
+        if (ImGui.BeginTable($"SocialList##Subscription", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
         {
             var index = 0;
             //TODO: not case sensitive
-            foreach (var name in Service.PlayersNamesManager.Subscriptions.Where(x=>x.Contains(_searchContent)))
+            var list = Service.PlayersNamesManager.Subscriptions.ToList();
+            foreach (var name in list)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGui.Text(name);
                 ImGui.TableNextColumn();
-                if (ImGui.Button(Service.Loc.Localize("Remove") + $"##{index}"))
+                if (ImGui.Button(Service.Loc.Localize("Remove") + $"##Sub{index}"))
                 {
                     Service.PlayersNamesManager.Subscriptions.Remove(name);
                 }

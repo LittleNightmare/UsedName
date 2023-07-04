@@ -2,6 +2,7 @@
 using System.Linq;
 using Dalamud.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using UsedName;
 using Lumina.Excel.GeneratedSheets;
 
@@ -59,22 +60,27 @@ public class ContextMenu : IDisposable
     {
         if (!IsMenuValid(args))
             return;
-        
+
         if (Service.Configuration.EnableSearchInContext)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SearchString, Search, true));
+            args.AddCustomItem(
+                new GameObjectContextMenuItem(new SeString(new TextPayload(Service.Configuration.SearchString)), Search,
+                    true));
         }
 
         var playerName = (args.Text ?? new SeString()).ToString();
         var playerInPluginFriendList = Service.PlayersNamesManager.SearchPlayer(playerName).Count >= 1;
         if (Service.Configuration.EnableAddNickName)
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.AddNickNameString, AddNickName, true));
+            args.AddCustomItem(new GameObjectContextMenuItem(
+                new SeString(new TextPayload(Service.Configuration.AddNickNameString)), AddNickName, true));
         }
 
-        if (Service.Configuration.EnableSubscription && !playerInPluginFriendList && !Service.PlayersNamesManager.Subscriptions.Exists(x => x==playerName))
+        if (Service.Configuration.EnableSubscription && !playerInPluginFriendList &&
+            !Service.PlayersNamesManager.Subscriptions.Exists(x => x == playerName))
         {
-            args.AddCustomItem(new GameObjectContextMenuItem(Service.Configuration.SubscriptionString, AddSubscription, true));
+            args.AddCustomItem(new GameObjectContextMenuItem(
+                new SeString(new TextPayload(Service.Configuration.SubscriptionString)), AddSubscription, true));
         }
     }
 

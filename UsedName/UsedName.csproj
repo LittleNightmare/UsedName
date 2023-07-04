@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>LittleNightmare</Authors>
     <Company></Company>
-    <Version>0.8.2.3</Version>
+    <Version>0.8.2.4</Version>
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<IsBuildForCN>false</IsBuildForCN>
+	<IsBuildForCN>true</IsBuildForCN>
   </PropertyGroup>
   <PropertyGroup Condition="$(IsBuildForCN) != 'true'">
 	<DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
