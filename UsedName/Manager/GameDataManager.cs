@@ -36,12 +36,6 @@ namespace UsedName.Manager
             this.GetSocialListHook?.Dispose();
         }
 
-        internal readonly List<ListType> AcceptType = new()
-        {
-            ListType.PartyList,
-            ListType.FriendList,
-            ListType.CompanyMember
-        };
         private void GetSocialListDetour(uint targetId, IntPtr data)
         {
             var socialList = Marshal.PtrToStructure<SocialListResult>(data);
@@ -66,29 +60,32 @@ namespace UsedName.Manager
 #endif
                 return;
             }
-
-
-            switch (listType)
+            var recordAllPlayersInList = false;
+            if ((listType == ListType.PartyList && Service.Configuration.UpdateFromPartyList) ||
+                (listType == ListType.FriendList && Service.Configuration.UpdateFromFriendList) ||
+                (listType == ListType.CompanyMember && Service.Configuration.UpdateFromCompanyMember))
             {
-                case ListType.PartyList when !Service.Configuration.UpdateFromPartyList:
-                case ListType.FriendList when !Service.Configuration.UpdateFromFriendList:
-                case ListType.CompanyMember when !Service.Configuration.UpdateFromCompanyMember:
-                case var _ when !AcceptType.Contains((ListType)listType) && !Service.Configuration.EnableSubscription:
-                    return;
+                recordAllPlayersInList = true;
             }
+            else if (!Service.Configuration.EnableSubscription)
+            {
+                return;
+            }
+
+            var subList = Service.PlayersNamesManager.Subscriptions;
+            if (!recordAllPlayersInList && subList.Count <= 0)
+                return;
             var result = new Dictionary<ulong, string>();
             var notInGameFriendListFriend = Service.PlayersNamesManager.NotInGameFriendListFriend();
-            var subList = Service.PlayersNamesManager.Subscriptions;
             foreach (var c in socialList.CharacterEntries)
             {
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||
                     c.CharacterName.IsNullOrEmpty())
                     continue;
-                if (AcceptType.Contains((ListType)listType) ||
-                    (Service.Configuration.EnableSubscription &&
-                                        (subList.RemoveAll(x => x == c.CharacterName)>0 || 
-                                         notInGameFriendListFriend.Exists(id => id == c.CharacterID))))
+                if (subList.RemoveAll(x => x == c.CharacterName)>0 || 
+                     notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
+                     recordAllPlayersInList)
                 {
                     if (!result.TryAdd(c.CharacterID, c.CharacterName))
                     {
