@@ -34,6 +34,7 @@ namespace UsedName
         public bool UpdateFromPartyList = false;
         public bool UpdateFromFriendList = true;
         public bool UpdateFromCompanyMember = false;
+        public bool UpdateFromPlayerSearch = false;
 
 
         public class PlayersNames

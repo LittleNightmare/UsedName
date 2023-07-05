@@ -60,32 +60,29 @@ namespace UsedName.Manager
 #endif
                 return;
             }
-            var recordAllPlayersInList = false;
-            if ((listType == ListType.PartyList && Service.Configuration.UpdateFromPartyList) ||
-                (listType == ListType.FriendList && Service.Configuration.UpdateFromFriendList) ||
-                (listType == ListType.CompanyMember && Service.Configuration.UpdateFromCompanyMember))
-            {
-                recordAllPlayersInList = true;
-            }
-            else if (!Service.Configuration.EnableSubscription)
-            {
-                return;
-            }
+            bool recordAllPlayersInList = (listType == ListType.PartyList && Service.Configuration.UpdateFromPartyList) ||
+                                          (listType == ListType.FriendList && Service.Configuration.UpdateFromFriendList) ||
+                                          (listType == ListType.CompanyMember && Service.Configuration.UpdateFromCompanyMember) ||
+                                          (listType == ListType.PlayerSearch && Service.Configuration.UpdateFromPlayerSearch);
 
             var subList = Service.PlayersNamesManager.Subscriptions;
-            if (!recordAllPlayersInList && subList.Count <= 0)
-                return;
+            // if (!recordAllPlayersInList && subList.Count <= 0)
+            //     return;
             var result = new Dictionary<ulong, string>();
-            var notInGameFriendListFriend = Service.PlayersNamesManager.NotInGameFriendListFriend();
+            // var notInGameFriendListFriend = Service.PlayersNamesManager.NotInGameFriendListFriend();
             foreach (var c in socialList.CharacterEntries)
             {
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||
                     c.CharacterName.IsNullOrEmpty())
                     continue;
+#if DEBUG
+                PluginLog.Debug($"UsedName: {c.CharacterID:X}:{c.CharacterName}");
+#endif
                 if (subList.RemoveAll(x => x == c.CharacterName)>0 || 
-                     notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
-                     recordAllPlayersInList)
+                    // notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
+                    Service.Configuration.playersNameList.ContainsKey(c.CharacterID) ||
+                    recordAllPlayersInList)
                 {
                     if (!result.TryAdd(c.CharacterID, c.CharacterName))
                     {

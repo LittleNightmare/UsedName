@@ -97,6 +97,10 @@ namespace UsedName.GUI
                 {
                     Service.Configuration.Save();
                 }
+                if (ImGui.Checkbox(Service.Loc.Localize("Update From PlayerSearch"), ref Service.Configuration.UpdateFromPlayerSearch))
+                {
+                    Service.Configuration.Save();
+                }
                 if (ImGui.Checkbox(Service.Loc.Localize("Enable Subscription"), ref Service.Configuration.EnableSubscription))
                 {
                     Service.Configuration.Save();
