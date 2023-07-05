@@ -72,13 +72,14 @@ namespace UsedName.Manager
             // var notInGameFriendListFriend = Service.PlayersNamesManager.NotInGameFriendListFriend();
             foreach (var c in socialList.CharacterEntries)
             {
+#if DEBUG
+                PluginLog.Debug($"UsedName: {c.CharacterID:X}:{c.CharacterName}");
+#endif
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||
                     c.CharacterName.IsNullOrEmpty())
                     continue;
-#if DEBUG
-                PluginLog.Debug($"UsedName: {c.CharacterID:X}:{c.CharacterName}");
-#endif
+
                 if (subList.RemoveAll(x => x == c.CharacterName)>0 || 
                     // notInGameFriendListFriend.Exists(id => id == c.CharacterID) ||
                     Service.Configuration.playersNameList.ContainsKey(c.CharacterID) ||
