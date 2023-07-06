@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -54,13 +55,33 @@ public unsafe struct SocialListResult
             }
             return null;
         }
-        set {}
+        set { }
     }
 }
 [StructLayout(LayoutKind.Explicit, Size = 0x68, Pack = 1)]
 public unsafe struct CharacterEntry
 {
     [FieldOffset(0x00)] public ulong CharacterID;
+    // TODO: Check Timestamp if it still works, or i need merge Timestamp and TerritoryID to ulong
+    [FieldOffset(0x08)] public uint Timestamp;
+    [FieldOffset(0x0C)] public uint TerritoryID;
+    [FieldOffset(0x10)] public ulong PlatformAccountUniqueID;
+    [FieldOffset(0x18)] public uint HierarchyID;
+    [FieldOffset(0x1C)] public ushort TerritoryTypeID;
+    [FieldOffset(0x1E)] public ushort ContentFinderConditionID;
+    [FieldOffset(0x20)] public byte GrandCompanyID;
+    [FieldOffset(0x21)] public byte Region;
+    [FieldOffset(0x22)] public byte SelectRegion;
+    [FieldOffset(0x23)] public byte IsSearchComment;
+    [FieldOffset(0x28)] public ulong OnlineStatusBytes;
+    [FieldOffset(0x30)] public byte CurrentClassID;
+    [FieldOffset(0x31)] public byte SelectClassID;
+    [FieldOffset(0x32)] public ushort CurrentLevel;
+    [FieldOffset(0x34)] public ushort SelectLevel;
+    [FieldOffset(0x36)] public byte Identity;
+    [FieldOffset(0x37)] public byte MinionaireInCount;
+    [FieldOffset(0x38)] public byte MinionaireFlag;
+    [FieldOffset(0x39)] public byte __padding1;
     // [FieldOffset(0x08)] public uint Timestamp;
     // [FieldOffset(0x0C)] public uint TerritoryID;
     // [FieldOffset(0x10)] public byte HierarchyStatus;
@@ -80,6 +101,7 @@ public unsafe struct CharacterEntry
     // [FieldOffset(0x26)] public ushort CurrentLevel;
     // [FieldOffset(0x28)] public ushort SelectLevel;
     // [FieldOffset(0x2A)] public byte Identity;
+    [FieldOffset(0x3A)] public ushort HomeWorldID;
     [FieldOffset(0x3C)] private fixed byte CharacterNameBytes[32];
     [FieldOffset(0x5C)] private fixed byte FcTagBytes[7];
 
@@ -87,7 +109,8 @@ public unsafe struct CharacterEntry
     {
         get
         {
-            fixed (byte* ptr = this.CharacterNameBytes) {
+            fixed (byte* ptr = this.CharacterNameBytes)
+            {
                 return Encoding.UTF8.GetString(ptr, 31).TrimEnd('\0');
             }
         }
@@ -98,72 +121,93 @@ public unsafe struct CharacterEntry
     {
         get
         {
-            fixed (byte* ptr = this.CharacterNameBytes) {
+            fixed (byte* ptr = this.FcTagBytes)
+            {
                 return Encoding.UTF8.GetString(ptr, 6).TrimEnd('\0');
             }
         }
         set { }
     }
-    /*
-        public ExcelResolver<ClassJob> CurrntClassJob => new(this.CurrentClassID);
-        // public ExcelResolver<ContentFinderCondition> ContentFinderCondition => new(this.ContentFinderConditionID);
-        public ExcelResolver<TerritoryType>? TerritoryType
-        {
-            get
-            {
-                if (this.TerritoryTypeID != 0) {
-                    return new ExcelResolver<TerritoryType>(this.TerritoryTypeID);
-                }
-                else {
-                    return null;
-                }
-            }
-            set { }
-        }
-
-        public List<ExcelResolver<OnlineStatus>> OnlineStatus
-        {
-            get
-            {
-                BitArray os = new BitArray(BitConverter.GetBytes(this.OnlineStatusBytes));
-                var list = new List<ExcelResolver<OnlineStatus>>();
-                foreach (var i in os)
-                {
-                    list.Add(new ExcelResolver<OnlineStatus>((uint)i));
-                }
-                return list;
-            }
-            set { }
-        }
-    }
-    public sealed class Character
+    public ExcelResolver<ClassJob> CurrentClassJob => new(this.CurrentClassID);
+    public ExcelResolver<ContentFinderCondition> ContentFinderCondition => new(this.ContentFinderConditionID);
+    public ExcelResolver<TerritoryType>? TerritoryType
     {
-        protected internal CharacterEntry Struct;
-        public byte ListType;
-        internal Character(CharacterEntry entry, byte listType)
+        get
         {
-            this.Struct = entry;
-            this.ListType = listType;
-        }
-
-        public DateTime? LocalDateTime
-        {
-            get
+            if (this.TerritoryTypeID != 0)
             {
-                if (this.ListType == 6 || this.ListType == 2) {
-                    //PluginLog.Log($"{this.Struct.TimeStamp}");
-                    return DateTimeOffset.FromUnixTimeSeconds((uint)this.Struct.Timestamp).LocalDateTime;
-                    //return null;
-                }
-                else return null;
+                return new ExcelResolver<TerritoryType>(this.TerritoryTypeID);
             }
-            set { }
+            else
+            {
+                return null;
+            }
         }
-        public unsafe void DumpBytes()
+        set { }
+    }
+
+    public List<ExcelResolver<OnlineStatus>> OnlineStatus
+    {
+        get
         {
-            var mem = stackalloc byte[0x58];
-            Marshal.StructureToPtr(this.Struct, (IntPtr)mem, false);
-            Util.DumpMemory((IntPtr)mem, 0x58);
+            BitArray os = new BitArray(BitConverter.GetBytes(this.OnlineStatusBytes));
+            var list = new List<ExcelResolver<OnlineStatus>>();
+            foreach (var i in os)
+            {
+                list.Add(new ExcelResolver<OnlineStatus>((uint)i));
+            }
+            return list;
         }
-    */
+        set { }
+    }
+
+    override public string ToString()
+    {
+        Type entryType = typeof(CharacterEntry);
+        FieldInfo[] fields = entryType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        StringBuilder sb = new StringBuilder();
+        foreach (var field in fields)
+        {
+            sb.Append($"{field.Name}:{field.GetValue(this)} ");
+        }
+        sb.Append($"CharacterName:{this.CharacterName} ");
+        sb.Append($"FcTag:{this.FcTag} ");
+        _ = sb.Append($"CurrentClassJob:{CurrentClassJob.GameData.NameEnglish.ToString()} ");
+        // sb.Append($"OnlineStatus:{string.Join(", ", this.OnlineStatus)} ");
+        _ = sb.Append($"ContentFinderCondition:{ContentFinderCondition.GameData.Name.ToString()} ");
+        _ = sb.Append($"TerritoryType:{this.TerritoryType?.GameData.PlaceName.Value.Name.ToString()} ");
+        return sb.ToString();
+    }
+}
+public sealed class Character
+{
+    protected internal CharacterEntry Struct;
+    public byte ListType;
+    internal Character(CharacterEntry entry, byte listType)
+    {
+        this.Struct = entry;
+        this.ListType = listType;
+    }
+
+    public DateTime? LocalDateTime
+    {
+        get
+        {
+            if (this.ListType == 6 || this.ListType == 2)
+            {
+                //PluginLog.Log($"{this.Struct.TimeStamp}");
+                return DateTimeOffset.FromUnixTimeSeconds((uint)this.Struct.Timestamp).LocalDateTime;
+                //return null;
+            }
+            else return null;
+        }
+        set { }
+    }
+
+    public unsafe void DumpBytes()
+    {
+        var mem = stackalloc byte[0x68];
+        Marshal.StructureToPtr(this.Struct, (IntPtr)mem, false);
+        Util.DumpMemory((IntPtr)mem, 0x68);
+    }
 }

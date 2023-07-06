@@ -38,6 +38,13 @@ namespace UsedName.Manager
 
         private void GetSocialListDetour(uint targetId, IntPtr data)
         {
+#if DEBUG
+            int startIndex = 0x10;
+            int endIndex = 0x10 + 0x68;
+            var bytes = new byte[endIndex - startIndex];
+            Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
+            PluginLog.Debug($"GetSocialListDetour: {BitConverter.ToString(bytes)}");
+#endif
             var socialList = Marshal.PtrToStructure<SocialListResult>(data);
             this.GetSocialListHook?.Original(targetId, data);
             var listType = socialList.ListType;
@@ -73,7 +80,7 @@ namespace UsedName.Manager
             foreach (var c in socialList.CharacterEntries)
             {
 #if DEBUG
-                PluginLog.Debug($"UsedName: {c.CharacterID:X}:{c.CharacterName}");
+                PluginLog.Debug(c.ToString());
 #endif
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||
