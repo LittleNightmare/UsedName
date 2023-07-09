@@ -50,7 +50,7 @@ public class SubscriptionWindow : Window, IDisposable
                 ImGui.TableNextColumn();
                 index++;
             }
+            ImGui.EndTable();
         }
-        ImGui.EndTable();
     }
 }

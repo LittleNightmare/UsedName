@@ -90,7 +90,7 @@ public class MainWindow : Window, IDisposable
                 ImGui.TableNextColumn();
                 index++;
             }
+            ImGui.EndTable();
         }
-        ImGui.EndTable();
     }
 }
