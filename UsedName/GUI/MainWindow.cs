@@ -76,6 +76,7 @@ public class MainWindow : Window, IDisposable
                 {
                     Service.PlayersNamesManager.TempPlayerName = player.currentName;
                     Service.PlayersNamesManager.TempPlayerID = id;
+                    Service.EditingWindow.TrustOpen = true;
                     Service.EditingWindow.IsOpen = true;
                 }
                 ImGui.TableNextColumn();

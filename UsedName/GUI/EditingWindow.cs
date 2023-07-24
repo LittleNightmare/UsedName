@@ -27,14 +27,21 @@ public class EditingWindow : Window, IDisposable
         GC.SuppressFinalize(this);
     }
 
+    // Editing Window is opened by source which could provide 100% accurate ContentId
+    public bool TrustOpen = false;
+
     public override void Draw()
     {
         ImGui.Text(Service.PlayersNamesManager.TempPlayerName + Service.Loc.Localize("'s current nick name:"));
-        var target = Service.GameDataManager.GetPlayerByNameFromFriendList(Service.PlayersNamesManager.TempPlayerName);
-        bool isEmpty = target.Equals(new XivCommon.Functions.FriendList.FriendListEntry());
-        ulong targetID = isEmpty ? Service.PlayersNamesManager.TempPlayerID : target.ContentId;
+
+        ulong targetID = Service.PlayersNamesManager.TempPlayerID;
         if (Service.Configuration.playersNameList.TryGetValue(targetID, out var tar1) && tar1.currentName == Service.PlayersNamesManager.TempPlayerName)
         {
+            if (!TrustOpen)
+            {
+                // if not trust open, warning user that this is not 100% accurate
+                ImGui.TextColored(new Vector4(1, 0, 0, 1), Service.Loc.Localize("WARNING: There may be other players with the same name\nPlease verify target before editing"));
+            }
             var nickName = Service.Configuration.playersNameList[targetID].nickName;
             // var nickName = target.nickName;
             if (ImGui.InputText("##CurrentNickName", ref nickName, 250))

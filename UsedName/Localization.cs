@@ -62,7 +62,15 @@ namespace UsedName
         {
             var str = JsonConvert.SerializeObject(this.languageDict);
             string TempPath = @"F:\ffxiv\";
-            File.WriteAllText(Path.Combine(Path.GetDirectoryName(TempPath), this.currentLanguage + ".json"), str);
+            try
+            {
+                File.WriteAllText(Path.Combine(Path.GetDirectoryName(TempPath), this.currentLanguage + ".json"), str);
+            }
+            catch (Exception e)
+            {
+
+            }
+           
         }
 
 #endif

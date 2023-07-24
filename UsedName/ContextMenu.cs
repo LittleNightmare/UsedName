@@ -3,7 +3,6 @@ using System.Linq;
 using Dalamud.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using UsedName;
 using Lumina.Excel.GeneratedSheets;
 
 namespace UsedName;
@@ -86,8 +85,12 @@ public class ContextMenu : IDisposable
 
     private void AddNickName(GameObjectContextMenuItemSelectedArgs args)
     {
-        Service.PlayersNamesManager.TempPlayerName = (args.Text ?? new SeString()).ToString();
-        Service.EditingWindow.IsOpen= true;
+        var playerName = (args.Text ?? new SeString()).ToString();
+        Service.PlayersNamesManager.TempPlayerName = playerName;
+        var searchResult = Service.PlayersNamesManager.SearchPlayer(playerName);
+        Service.PlayersNamesManager.TempPlayerID = searchResult.Count > 0 ? searchResult.First().Key : (ulong)0;
+        Service.EditingWindow.TrustOpen = false;
+        Service.EditingWindow.IsOpen = true;
     }
 
     private void AddSubscription(GameObjectContextMenuItemSelectedArgs args)
@@ -100,7 +103,7 @@ public class ContextMenu : IDisposable
             return;
         Service.PlayersNamesManager.Subscriptions.Add(playerName);
         Service.PlayersNamesManager.Subscriptions.Sort();
-        Service.Chat.Print(String.Format(Service.Loc.Localize("Added {0} to subscription list"),playerName));
+        Service.Chat.Print(String.Format(Service.Loc.Localize("Added {0} to subscription list"), playerName));
     }
 
     private void Search(GameObjectContextMenuItemSelectedArgs args)
@@ -114,6 +117,6 @@ public class ContextMenu : IDisposable
         {
             Service.Chat.PrintError("Cannot find");
         }
-        
+
     }
 }

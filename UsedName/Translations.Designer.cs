@@ -62,18 +62,18 @@ namespace UsedName {
         
         /// <summary>
         ///   查找类似 {
-        ///	&quot;Update FriendList&quot;: &quot;鏇存柊濂藉弸鍒楄〃&quot;,
-        ///	&quot;Language:&quot;: &quot;璇█:&quot;,
-        ///	&quot;Name Change Check&quot;: &quot;妫€鏌ュ鍚嶅彉鏇?,
-        ///	&quot;Enable Search In Context&quot;: &quot;鍚敤鍙抽敭鑿滃崟鎼滅储&quot;,
-        ///	&quot;Search in Context String&quot;: &quot;鎼滅储鎸夐挳&quot;,
-        ///	&quot;Enable Add Nick Name&quot;: &quot;鍚敤鍙抽敭娣诲姞鏄电О&quot;,
-        ///	&quot;Add Nick Name String&quot;: &quot;娣诲姞鏄电О鎸夐挳&quot;,
-        ///	&quot;Show palyer who changed name when update FriendList&quot;: &quot;鏇存柊濂藉弸鍒楄〃鏃讹紝鏄剧ず濮撳悕鍙樻洿&quot;,
-        ///	&quot;Update FriendList completed&quot;: &quot;鏇存柊濂藉弸鍒楄〃瀹屾垚&quot;,
-        ///	&quot;Parameter error, length is &apos;{0}&apos;&quot;: &quot;鍙傛暟閿欒锛岄暱搴︿负&apos;{0}&apos;&quot;,
-        ///	&quot;Invalid parameter: &quot;: &quot;闈炴硶鍙傛暟: &quot;,
-        ///	&quot; changed name to &quot; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///    &quot;Update FriendList&quot;: &quot;更新好友列表&quot;,
+        ///    &quot;Language:&quot;: &quot;语言:&quot;,
+        ///    &quot;Name Change Check&quot;: &quot;检查姓名变更&quot;,
+        ///    &quot;Enable Search In Context&quot;: &quot;启用右键菜单搜索&quot;,
+        ///    &quot;Search in Context String&quot;: &quot;搜索按钮&quot;,
+        ///    &quot;Enable Add Nick Name&quot;: &quot;启用右键添加昵称&quot;,
+        ///    &quot;Add Nick Name String&quot;: &quot;添加昵称按钮&quot;,
+        ///    &quot;Show player who changed name when update FriendList&quot;: &quot;更新好友列表时，显示姓名变更&quot;,
+        ///    &quot;Update FriendList completed&quot;: &quot;更新好友列表完成&quot;,
+        ///    &quot;Parameter error, length is &apos;{0}&apos;&quot;: &quot;参数错误，长度为&apos;{0}&apos;&quot;,
+        ///    &quot;Invalid parameter: &quot;: &quot;非法参数: &quot;,
+        ///    &quot; changed name to &quot;: [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         public static string zh_CN {
             get {

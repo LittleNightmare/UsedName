@@ -13,6 +13,7 @@ using XivCommon;
 using Dalamud.ContextMenu;
 using Dalamud.Hooking;
 using System;
+using Dalamud.Interface.Windowing;
 using UsedName.GUI;
 using UsedName.Manager;
 
@@ -45,6 +46,6 @@ namespace UsedName
         [PluginService]
         internal static CommandManager CommandManager { get; private set; } = null!;
         [PluginService]
-        internal static GameNetwork Network { get; private set; } = null!;
+        internal static WindowSystem WindowSystem { get; set; } = null!;
     }
 }

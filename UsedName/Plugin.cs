@@ -20,7 +20,6 @@ namespace UsedName
         public string Name => "Used Name";
 
         private readonly ContextMenu contextMenu;
-        private readonly WindowSystem windowSystem;
 
 
         public UsedName(
@@ -39,21 +38,21 @@ namespace UsedName
 
             Service.Commands = new Commands();
             Service.GameDataManager = new GameDataManager();
-            Service.PlayersNamesManager =  new PlayersNamesManager();
-           
+            Service.PlayersNamesManager = new PlayersNamesManager();
+            Service.WindowSystem = new WindowSystem("UsedName");
+
             Service.MainWindow = new MainWindow();
             Service.ConfigWindow = new ConfigWindow();
             Service.EditingWindow = new EditingWindow();
             Service.SubscriptionWindow = new SubscriptionWindow();
-            this.windowSystem= new WindowSystem("UsedName");
-            this.windowSystem.AddWindow(Service.MainWindow);
-            this.windowSystem.AddWindow(Service.ConfigWindow);
-            this.windowSystem.AddWindow(Service.EditingWindow);
-            this.windowSystem.AddWindow(Service.SubscriptionWindow);
-            
-            Service.PluginInterface.UiBuilder.Draw += this.windowSystem.Draw;
+            Service.WindowSystem.AddWindow(Service.MainWindow);
+            Service.WindowSystem.AddWindow(Service.ConfigWindow);
+            Service.WindowSystem.AddWindow(Service.EditingWindow);
+            Service.WindowSystem.AddWindow(Service.SubscriptionWindow);
+
+            Service.PluginInterface.UiBuilder.Draw += Service.WindowSystem.Draw;
             Service.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-            
+
         }
 
         public void Dispose()
@@ -63,9 +62,9 @@ namespace UsedName
             Service.Common.Dispose();
             this.contextMenu.Dispose();
             Service.ContextMenu.Dispose();
-            Service.Configuration.Save(storeName:true);
+            Service.Configuration.Save(storeName: true);
 
-            Service.PluginInterface.UiBuilder.Draw -= this.windowSystem.Draw;
+            Service.PluginInterface.UiBuilder.Draw -= Service.WindowSystem.Draw;
             Service.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
 #if DEBUG
             Service.Loc.StoreLanguage();
