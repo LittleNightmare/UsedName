@@ -32,6 +32,7 @@ namespace UsedName
         internal static XivCommonBase Common { get; set; } = null!;
         internal static DalamudContextMenu ContextMenu { get; set; } = null!;
         internal static Localization Loc { get; set; } = null!;
+        internal static WindowSystem WindowSystem { get; set; } = null!;
 
         [PluginService]
         internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;
@@ -45,7 +46,5 @@ namespace UsedName
         internal static ChatGui Chat { get; private set; } = null!;
         [PluginService]
         internal static CommandManager CommandManager { get; private set; } = null!;
-        [PluginService]
-        internal static WindowSystem WindowSystem { get; set; } = null!;
     }
 }
