@@ -138,7 +138,7 @@ namespace UsedName.Manager
         internal void UpdateDataFromXivCommon()
         {
             var currentPlayersList = GetDataFromXivCommon();
-            if(currentPlayersList != null)
+            if(currentPlayersList is { Count: > 0 })
                 Service.PlayersNamesManager.UpdatePlayerNames(currentPlayersList);
         }
 

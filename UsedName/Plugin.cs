@@ -36,9 +36,9 @@ namespace UsedName
 
             Service.Loc = new Localization();
 
-            Service.Commands = new Commands();
-            Service.GameDataManager = new GameDataManager();
             Service.PlayersNamesManager = new PlayersNamesManager();
+            Service.GameDataManager = new GameDataManager();
+            Service.Commands = new Commands();
             Service.WindowSystem = new WindowSystem("UsedName");
 
             Service.MainWindow = new MainWindow();
