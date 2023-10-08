@@ -1,13 +1,8 @@
-﻿using Dalamud;
-using Dalamud.ContextMenu;
+﻿using Dalamud.ContextMenu;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
-using Dalamud.Utility;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UsedName.GUI;
 using UsedName.Manager;
 using XivCommon;
@@ -26,12 +21,12 @@ namespace UsedName
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Service>();
-            Service.ContextMenu = new DalamudContextMenu();
+            Service.ContextMenu = new DalamudContextMenu(pluginInterface);
 
             Service.Configuration = Service.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Service.Configuration.Initialize();
 
-            Service.Common = new XivCommonBase();
+            Service.Common = new XivCommonBase(pluginInterface);
             this.contextMenu = new ContextMenu();
 
             Service.Loc = new Localization();

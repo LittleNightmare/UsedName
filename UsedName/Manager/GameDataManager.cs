@@ -1,12 +1,8 @@
 ﻿using Dalamud.Hooking;
-using Dalamud.Logging;
 using Dalamud.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using UsedName.Structs;
 
 namespace UsedName.Manager
@@ -19,7 +15,7 @@ namespace UsedName.Manager
         {
             if (Service.Scanner.TryScanText("48 89 5c 24 ?? 56 48 ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 48 ?? ?? e8 ?? ?? ?? ?? 48 ?? ?? 48 ?? ?? 0f 84 ?? ?? ?? ?? 0f", out var ptr0))
             {
-                this.GetSocialListHook = Hook<GetSocialListDelegate>.FromAddress(ptr0, GetSocialListDetour);
+                this.GetSocialListHook = Service.GameInteropProvider.HookFromAddress<GetSocialListDelegate>(ptr0, GetSocialListDetour);
             }
             if (Service.Configuration.EnableAutoUpdate)
                 this.GetSocialListHook?.Enable();
@@ -43,13 +39,13 @@ namespace UsedName.Manager
             int endIndex = 0x10 + 0x68;
             var bytes = new byte[endIndex - startIndex];
             Marshal.Copy(data + startIndex, bytes, 0, bytes.Length);
-            PluginLog.Debug($"GetSocialListDetour: {BitConverter.ToString(bytes)}");
+            Service.PluginLog.Debug($"GetSocialListDetour: {BitConverter.ToString(bytes)}");
 #endif
             var socialList = Marshal.PtrToStructure<SocialListResult>(data);
             this.GetSocialListHook?.Original(targetId, data);
             var listType = socialList.ListType;
-            PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}:{socialList.Index}:{socialList.NextIndex}:{socialList.RequestKey}:{socialList.RequestParam}");
-            PluginLog.Debug($"ListType:{socialList.ListTypeByte:X}");
+            Service.PluginLog.Debug($"CommunityID:{socialList.CommunityID:X}:{socialList.Index}:{socialList.NextIndex}:{socialList.RequestKey}:{socialList.RequestParam}");
+            Service.PluginLog.Debug($"ListType:{socialList.ListTypeByte:X}");
             // type: 1 = Party List; 2 = Friend List; 3 = Linkshells 4 = Player Search;
             // 5 = Members Online and on Home World; 6 = company member; 7 = Application of Company;
             // 10 = Mentor;11 = New Adventurer/Returner; 
@@ -63,7 +59,7 @@ namespace UsedName.Manager
                 {
                     hint += $"\n{character.CharacterID:X}:{character.CharacterName}";
                 }
-                PluginLog.Warning(hint);
+                Service.PluginLog.Warning(hint);
 #endif
                 return;
             }
@@ -80,7 +76,7 @@ namespace UsedName.Manager
             foreach (var c in socialList.CharacterEntries)
             {
 #if DEBUG
-                PluginLog.Debug(c.ToString());
+                Service.PluginLog.Debug(c.ToString());
 #endif
                 if (c.CharacterID == 0 ||
                     c.CharacterID == Service.ClientState.LocalContentId ||
@@ -94,7 +90,7 @@ namespace UsedName.Manager
                 {
                     if (!result.TryAdd(c.CharacterID, c.CharacterName))
                     {
-                        PluginLog.LogWarning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
+                        Service.PluginLog.Warning($"Duplicate entry {c.CharacterID} {c.CharacterName}");
                     }
                 }
 
@@ -126,8 +122,8 @@ namespace UsedName.Manager
                 }
                 catch (ArgumentException e)
                 {
-                    PluginLog.Warning($"{e}");
-                    PluginLog.Warning($"Unknown problem at {name}-{contentId}");
+                    Service.PluginLog.Warning($"{e}");
+                    Service.PluginLog.Warning($"Unknown problem at {name}-{contentId}");
                     Service.Chat.PrintError(Service.Loc.Localize($"Update Player List Fail\nMay cause by incompatible version of XivCommon\nPlease contact to developer"));
                     return null;
                 }

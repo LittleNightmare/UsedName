@@ -1,16 +1,12 @@
 ﻿using Dalamud.Configuration;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Plugin;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
-using System.Text;
 using System.Text.Json;
 using System.Linq;
 using Dalamud;
-using Dalamud.Logging;
 using Dalamud.Utility;
 
 namespace UsedName
@@ -114,7 +110,7 @@ namespace UsedName
                                        "You modify path of storeNames.json, but there is other storeNames.json at orginal path\n" + 
                                        "Please, delete one that you don't want to use after game close\n") + 
                                    $"Your Path(Current Loading): {storeNamesPath}\nOrginal Path:{defaultPath}";
-                        PluginLog.Warning(hint);
+                        Service.PluginLog.Warning(hint);
                         Service.Chat.PrintError(hint);
                     }
                 }

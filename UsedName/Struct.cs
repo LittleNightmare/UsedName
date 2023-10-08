@@ -1,19 +1,12 @@
-﻿using Dalamud.Data;
-using Dalamud.Logging;
-using Dalamud.Utility;
-using Lumina.Excel;
+﻿using Dalamud.Utility;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UsedName.Structs;
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
-using Dalamud;
 
 namespace UsedName
 {

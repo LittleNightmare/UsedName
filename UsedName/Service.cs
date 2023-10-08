@@ -1,21 +1,12 @@
-﻿using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
-using Dalamud.Game.Gui.FlyText;
+﻿using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using Dalamud.Game.Network;
 using XivCommon;
 using Dalamud.ContextMenu;
-using Dalamud.Hooking;
-using System;
 using Dalamud.Interface.Windowing;
 using UsedName.GUI;
 using UsedName.Manager;
+using Dalamud.Plugin.Services;
 
 namespace UsedName
 {
@@ -37,14 +28,18 @@ namespace UsedName
         [PluginService]
         internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;
         [PluginService]
-        internal static SigScanner Scanner { get; private set; } = null!;
+        internal static ISigScanner Scanner { get; private set; } = null!;
         [PluginService]
-        internal static ClientState ClientState { get; private set; } = null!;
+        internal static IClientState ClientState { get; private set; } = null!;
         [PluginService]
-        internal static DataManager DataManager { get; private set; } = null!;
+        internal static IDataManager DataManager { get; private set; } = null!;
         [PluginService]
-        internal static ChatGui Chat { get; private set; } = null!;
+        internal static IChatGui Chat { get; private set; } = null!;
         [PluginService]
-        internal static CommandManager CommandManager { get; private set; } = null!;
+        internal static ICommandManager CommandManager { get; private set; } = null!;
+        [PluginService]
+        internal static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
+        [PluginService]
+        internal static IPluginLog PluginLog { get; private set; } = null!;
     }
 }

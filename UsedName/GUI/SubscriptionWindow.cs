@@ -1,11 +1,8 @@
 ﻿using Dalamud.Interface.Windowing;
-using Dalamud.Utility;
 using ImGuiNET;
-using ImGuiScene;
 using System;
 using System.Linq;
 using System.Numerics;
-using UsedName;
 
 namespace UsedName.GUI;
 

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>LittleNightmare</Authors>
     <Company></Company>
-    <Version>0.8.3.5</Version>
+    <Version>0.8.4.0</Version>
     <Description>a plugin to record your firend's used name</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/LittleNightmare/UsedName</PackageProjectUrl>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<IsBuildForCN>true</IsBuildForCN>
+	<IsBuildForCN>false</IsBuildForCN>
   </PropertyGroup>
   <PropertyGroup Condition="$(IsBuildForCN) != 'true'">
 	<DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
@@ -59,9 +59,9 @@
   </ItemGroup>
 	
   <ItemGroup Condition="$(IsBuildForCN)!='true'">
-    <PackageReference Include="DalamudPackager" Version="2.1.11" />
-    <PackageReference Include="Dalamud.ContextMenu" Version="1.2.3" />
-    <PackageReference Include="XivCommon" Version="7.0.2" />
+    <PackageReference Include="DalamudPackager" Version="2.1.12" />
+    <PackageReference Include="Dalamud.ContextMenu" Version="1.3.1" />
+    <PackageReference Include="XivCommon" Version="9.0.0" />
   </ItemGroup>
 	
   <ItemGroup Condition="$(IsBuildForCN)=='true'">
