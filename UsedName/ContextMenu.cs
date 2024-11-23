@@ -2,7 +2,6 @@
 using System.Linq;
 using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Lumina.Excel.Sheets;
 
 namespace UsedName;
@@ -11,7 +10,7 @@ public class ContextMenu
 {
     public static void Enable()
     {
-        Service.ContextMenu.OnMenuOpened -=     OnOpenContextMenu;
+        Service.ContextMenu.OnMenuOpened -= OnOpenContextMenu;
         Service.ContextMenu.OnMenuOpened += OnOpenContextMenu;
     }
 
@@ -61,7 +60,8 @@ public class ContextMenu
 
         if (Service.Configuration.EnableSearchInContext)
         {
-            menuOpenedArgs.AddMenuItem(new MenuItem { 
+            menuOpenedArgs.AddMenuItem(new MenuItem
+            {
                 PrefixChar = 'U',
                 Name = Service.Configuration.SearchString,
                 OnClicked = Search
@@ -113,7 +113,7 @@ public class ContextMenu
         {
             return;
         }
-        var world = Service.DataManager.GetExcelSheet<World>()?.FirstOrDefault(x => x.RowId == menuTargetDefault.TargetHomeWorld.RowId);
+        var world = new ExcelResolver<World>(menuTargetDefault.TargetHomeWorld.RowId);
         if (world == null)
             return;
         var playerName = (menuTargetDefault.TargetName ?? new SeString()).ToString();
