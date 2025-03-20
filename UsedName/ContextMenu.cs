@@ -121,7 +121,7 @@ public class ContextMenu
             return;
         Service.PlayersNamesManager.Subscriptions.Add(playerName);
         Service.PlayersNamesManager.Subscriptions.Sort();
-        Service.Chat.Print(String.Format(Service.Loc.Localize("Added {0} to subscription list"), playerName));
+        Service.Chat.Print(String.Format("Added {0} to subscription list".Loc(), playerName));
     }
 
     private static void Search(IMenuItemClickedArgs args)
@@ -137,8 +137,7 @@ public class ContextMenu
         }
         else
         {
-            Service.Chat.PrintError("Cannot find");
+            Service.Chat.PrintError("Cannot find".Loc());
         }
-
     }
 }

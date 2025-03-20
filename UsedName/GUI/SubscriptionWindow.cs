@@ -40,7 +40,7 @@ public class SubscriptionWindow : Window, IDisposable
                 ImGui.TableNextColumn();
                 ImGui.Text(name);
                 ImGui.TableNextColumn();
-                if (ImGui.Button(Service.Loc.Localize("Remove") + $"##Sub{index}"))
+                if (ImGui.Button("Remove".Loc() + $"##Sub{index}"))
                 {
                     Service.PlayersNamesManager.Subscriptions.Remove(name);
                 }

@@ -38,7 +38,7 @@ namespace UsedName.Manager
                         if (Service.Configuration.ShowNameChange)
                         {
                             var temp = string.IsNullOrEmpty(savedFriendList[contentId].nickName) ? savedFriendList[contentId].currentName : $"({savedFriendList[contentId].nickName})";
-                            Service.Chat.Print(temp + Service.Loc.Localize($" changed name to ") + $"{name}");
+                            Service.Chat.Print(temp + " changed name to ".Loc() + $"{name}");
                         }
                         savedFriendList[contentId].usedNames.Add(savedFriendList[contentId].currentName);
                         savedFriendList[contentId].currentName = name;
@@ -62,11 +62,11 @@ namespace UsedName.Manager
                 {
                     foreach (var player in newlyAddedPlayersFromSub)
                     {
-                        Service.Chat.Print(string.Format(Service.Loc.Localize($"Successfully added {0} to plguin's player list"), player));
+                        Service.Chat.Print(string.Format("Successfully added {0} to plguin's player list".Loc(), player));
                     }
                 }
 
-                Service.Chat.Print(Service.Loc.Localize("Update FriendList completed"));
+                Service.Chat.Print("Update FriendList completed".Loc());
             }
         }
 
@@ -105,7 +105,7 @@ namespace UsedName.Manager
                 resultBuilder.Append($"{player.Value.currentName}{temp}: [{string.Join(",", player.Value.usedNames)}]\n");
             }
             string result = resultBuilder.ToString();
-            Service.Chat.Print(string.Format(Service.Loc.Localize("Search result(s) for target [{0}]:"), targetName) + $"\n{result}");
+            Service.Chat.Print(string.Format("Search result(s) for target [{0}]:".Loc(), targetName) + $"\n{result}");
             return result;
         }
 
@@ -114,23 +114,23 @@ namespace UsedName.Manager
             var player = SearchPlayer(playerName);
             if (player.Count == 0)
             {
-                Service.Chat.PrintError(string.Format(Service.Loc.Localize("Cannot find player '{0}', Please try using '/pname update' to update FriendList, or check the spelling"), playerName));
+                Service.Chat.PrintError(string.Format("Cannot find player '{0}', Please try using '/pname update' to update FriendList, or check the spelling".Loc(), playerName));
                 return;
             }
             if (player.Count > 1)
             {
-                Service.Chat.PrintError(string.Format(Service.Loc.Localize("Find multiple '{0}', please search for players using the exact name"), playerName));
+                Service.Chat.PrintError(string.Format("Find multiple '{0}', please search for players using the exact name".Loc(), playerName));
                 return;
             }
             Service.Configuration.playersNameList[player.First().Key].nickName = nickName;
             Service.Configuration.StoreNames();
-            Service.Chat.Print(string.Format(Service.Loc.Localize("The nickname of {0} has been set to {1}"), playerName, nickName));
+            Service.Chat.Print(string.Format("The nickname of {0} has been set to {1}".Loc(), playerName, nickName));
         }
 
 
         public void RemovePlayer(ulong id)
         {
-            Service.Chat.Print(string.Format(Service.Loc.Localize("Remove player {0} from list"), Service.Configuration.playersNameList[id].currentName));
+            Service.Chat.Print(string.Format("Remove player {0} from list".Loc(), Service.Configuration.playersNameList[id].currentName));
             Service.Configuration.playersNameList.Remove(id);
             Service.Configuration.StoreNames();
         }

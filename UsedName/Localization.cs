@@ -5,6 +5,14 @@ using System.IO;
 
 namespace UsedName
 {
+    public static class LocalizationExtensions
+    {
+        public static string Loc(this string message)
+        {
+            return Service.Loc.Localize(message);
+        }
+    }
+
     class Localization
     {
         internal string currentLanguage;

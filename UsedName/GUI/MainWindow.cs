@@ -41,21 +41,21 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        if (ImGui.Button(Service.Loc.Localize("Setting")))
+        if (ImGui.Button("Setting".Loc()))
         {
             Service.ConfigWindow.Toggle();
         }
         ImGui.SameLine();
-        ImGui.Text(Service.Loc.Localize("Search:"));
+        ImGui.Text("Search:".Loc());
         ImGui.SameLine();
         ImGui.SetNextItemWidth(200);
-        ImGui.InputTextWithHint("##searchContent", Service.Loc.Localize("Enter player's name here"), ref _searchContent, 250);
+        ImGui.InputTextWithHint("##searchContent", "Enter player's name here".Loc(), ref _searchContent, 250);
 
         if (ImGui.BeginTable($"SocialList##{_searchContent}", TableColum.Length, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable))
         {
             foreach (var t in TableColum)
             {
-                var c = Service.Loc.Localize(t);
+                var c = t.Loc();
                 ImGui.TableSetupColumn(c, ImGuiTableColumnFlags.None, c.Length);
             }
             ImGui.TableHeadersRow();
@@ -70,7 +70,7 @@ public class MainWindow : Window, IDisposable
                     ImGui.Text(id.ToString());
                     if (ImGui.IsItemHovered())
                     {
-                        ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                        ImGui.SetTooltip("Left click to copy".Loc());
                         if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(id.ToString());
                     }
                 }
@@ -78,31 +78,31 @@ public class MainWindow : Window, IDisposable
                 ImGui.Text(player.currentName);
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                    ImGui.SetTooltip("Left click to copy".Loc());
                     if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(player.currentName);
                 }
                 ImGui.TableNextColumn();
                 ImGui.Text(player.nickName);
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                    ImGui.SetTooltip("Left click to copy".Loc());
                     if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(player.nickName);
                 }
                 ImGui.TableNextColumn();
                 ImGui.Text(player.firstUsedname);
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Left click to copy"));
+                    ImGui.SetTooltip("Left click to copy".Loc());
                     if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) ImGui.SetClipboardText(player.firstUsedname);
                 }
                 ImGui.TableNextColumn();
-                if (ImGui.Button(Service.Loc.Localize("Show") + $"##{index}"))
+                if (ImGui.Button("Show".Loc() + $"##{index}"))
                 {
                     var temp = string.IsNullOrEmpty(player.nickName) ? "" : "(" + player.nickName + ")";
                     Service.Chat.Print($"{player.currentName}{temp}: [{string.Join(",", player.usedNames)}]");
                 }
                 ImGui.TableNextColumn();
-                if (ImGui.Button(Service.Loc.Localize("Edit") + $"##{index}"))
+                if (ImGui.Button("Edit".Loc() + $"##{index}"))
                 {
                     Service.PlayersNamesManager.TempPlayerName = player.currentName;
                     Service.PlayersNamesManager.TempPlayerID = id;
@@ -110,13 +110,13 @@ public class MainWindow : Window, IDisposable
                     Service.EditingWindow.IsOpen = true;
                 }
                 ImGui.TableNextColumn();
-                if (ImGui.Button(Service.Loc.Localize("Remove") + $"##{index}") && ImGui.IsKeyPressed(ImGuiKey.LeftCtrl))
+                if (ImGui.Button("Remove".Loc() + $"##{index}") && ImGui.IsKeyPressed(ImGuiKey.LeftCtrl))
                 {
                     Service.PlayersNamesManager.RemovePlayer(id);
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Holding LeftCtrl to Remove this record. It will be re-added on update base on your setting,\nbut will not contain the previous data (e.g. used names, nickname)"));
+                    ImGui.SetTooltip("Holding LeftCtrl to Remove this record. It will be re-added on update base on your setting,\nbut will not contain the previous data (e.g. used names, nickname)".Loc());
                 }
                 ImGui.TableNextColumn();
                 index++;

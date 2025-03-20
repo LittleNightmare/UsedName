@@ -27,23 +27,23 @@ namespace UsedName.GUI
 
         public override void Draw()
         {
-            if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
+            if (ImGui.Button("Update FriendList".Loc()))
             {
                 //Service.GameDataManager.UpdateDataFromXivCommon();
                 Service.Chat.Print("The current function is not available");
             }
             ImGui.SameLine();
-            if (ImGui.Button(Service.Loc.Localize("Open Main Window")))
+            if (ImGui.Button("Open Main Window".Loc()))
             {
                 Service.MainWindow.Toggle();
             }
             ImGui.SameLine();
-            if (ImGui.Button(Service.Loc.Localize("Open Subscription Window")))
+            if (ImGui.Button("Open Subscription Window".Loc()))
             {
                 Service.SubscriptionWindow.Toggle();
             }
             ImGui.Spacing();
-            ImGui.Text(Service.Loc.Localize("Language:"));
+            ImGui.Text("Language:".Loc());
             ImGui.SameLine();
             ImGui.SetNextItemWidth(200);
             if (ImGui.BeginCombo("##Language", Service.Configuration.Language))
@@ -62,7 +62,7 @@ namespace UsedName.GUI
             }
 
             // checkbox EnableAutoUpdate
-            if (ImGui.Checkbox(Service.Loc.Localize("Enable Auto Update"), ref Service.Configuration.EnableAutoUpdate))
+            if (ImGui.Checkbox("Enable Auto Update".Loc(), ref Service.Configuration.EnableAutoUpdate))
             {
                 Service.Configuration.Save();
                 if (Service.Configuration.EnableAutoUpdate)
@@ -74,45 +74,45 @@ namespace UsedName.GUI
                     Service.GameDataManager.GetSocialListHook?.Disable();
                 }
             }
-            var typeNames = Enum.GetNames(typeof(ListType)).Select(Service.Loc.Localize);
+            var typeNames = Enum.GetNames(typeof(ListType)).Select(x => x.Loc());
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip(Service.Loc.Localize("Automatically record the checked social list.\nOptionally visible when checked.\nAnd automatically get updates\nwhen the following lists are opened.")+ "\n\n" + string.Join("\n",typeNames));
+                ImGui.SetTooltip("Automatically record the checked social list.\nOptionally visible when checked.\nAnd automatically get updates\nwhen the following lists are opened.".Loc()+ "\n\n" + string.Join("\n",typeNames));
             }
             if (Service.Configuration.EnableAutoUpdate)
             {
                 ImGui.Spacing();
                 ImGui.Indent();
-                if (ImGui.Checkbox(Service.Loc.Localize("Update From PartyList"), ref Service.Configuration.UpdateFromPartyList))
+                if (ImGui.Checkbox("Update From PartyList".Loc(), ref Service.Configuration.UpdateFromPartyList))
                 {
                     Service.Configuration.Save();
                 }
-                if (ImGui.Checkbox(Service.Loc.Localize("Update From FriendList"), ref Service.Configuration.UpdateFromFriendList))
+                if (ImGui.Checkbox("Update From FriendList".Loc(), ref Service.Configuration.UpdateFromFriendList))
                 {
                     Service.Configuration.Save();
                 }
-                if (ImGui.Checkbox(Service.Loc.Localize("Update From CompanyMember"), ref Service.Configuration.UpdateFromCompanyMember))
+                if (ImGui.Checkbox("Update From CompanyMember".Loc(), ref Service.Configuration.UpdateFromCompanyMember))
                 {
                     Service.Configuration.Save();
                 }
-                if (ImGui.Checkbox(Service.Loc.Localize("Update From PlayerSearch"), ref Service.Configuration.UpdateFromPlayerSearch))
+                if (ImGui.Checkbox("Update From PlayerSearch".Loc(), ref Service.Configuration.UpdateFromPlayerSearch))
                 {
                     Service.Configuration.Save();
                 }
-                if (ImGui.Checkbox(Service.Loc.Localize("Enable Subscription"), ref Service.Configuration.EnableSubscription))
+                if (ImGui.Checkbox("Enable Subscription".Loc(), ref Service.Configuration.EnableSubscription))
                 {
                     Service.Configuration.Save();
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Service.Loc.Localize("Add a new subscription list.\nDuring updates, if a subscribed player's name exists,\nthis player will be added to the plugin's stored players'name list")+"\n"+
-                        Service.Loc.Localize("Players in the subscription list will be\nautomatically removed after successful capture of information\nor cleared when closing the game"));
+                    ImGui.SetTooltip("Add a new subscription list.\nDuring updates, if a subscribed player's name exists,\nthis player will be added to the plugin's stored players'name list".Loc()+"\n"+
+                        "Players in the subscription list will be\nautomatically removed after successful capture of information\nor cleared when closing the game".Loc());
                 }
                 if (Service.Configuration.EnableSubscription)
                 {
                     ImGui.Spacing();
                     ImGui.Indent();
-                    ImGui.TextUnformatted(Service.Loc.Localize("Subscription String"));
+                    ImGui.TextUnformatted("Subscription String".Loc());
                     ImGui.SameLine();
                     if (ImGui.InputText("##SubscriptionString", ref Service.Configuration.SubscriptionString, 15))
                     {
@@ -123,15 +123,15 @@ namespace UsedName.GUI
                 ImGui.Unindent();
             }
 
-            if (ImGui.Checkbox(Service.Loc.Localize("Name Change Check"), ref Service.Configuration.ShowNameChange))
+            if (ImGui.Checkbox("Name Change Check".Loc(), ref Service.Configuration.ShowNameChange))
             {
                 Service.Configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip(Service.Loc.Localize("Show player who changed name when update FriendList"));
+                ImGui.SetTooltip("Show player who changed name when update FriendList".Loc());
             }
-            if (ImGui.Checkbox(Service.Loc.Localize("Enable Search In Context"), ref Service.Configuration.EnableSearchInContext))
+            if (ImGui.Checkbox("Enable Search In Context".Loc(), ref Service.Configuration.EnableSearchInContext))
             {
                 Service.Configuration.Save();
             }
@@ -140,7 +140,7 @@ namespace UsedName.GUI
             {
                 ImGui.Spacing();
                 ImGui.Indent();
-                ImGui.TextUnformatted(Service.Loc.Localize("Search in Context String"));
+                ImGui.TextUnformatted("Search in Context String".Loc());
                 ImGui.SameLine();
                 if (ImGui.InputText("##SearchInContextString", ref Service.Configuration.SearchString, 15))
                 {
@@ -149,7 +149,7 @@ namespace UsedName.GUI
                 ImGui.Unindent();
 
             }
-            if (ImGui.Checkbox(Service.Loc.Localize("Enable Add Nick Name"), ref Service.Configuration.EnableAddNickName))
+            if (ImGui.Checkbox("Enable Add Nick Name".Loc(), ref Service.Configuration.EnableAddNickName))
             {
                 Service.Configuration.Save();
             }
@@ -157,7 +157,7 @@ namespace UsedName.GUI
             {
                 ImGui.Spacing();
                 ImGui.Indent();
-                ImGui.TextUnformatted(Service.Loc.Localize("Add Nick Name String"));
+                ImGui.TextUnformatted("Add Nick Name String".Loc());
                 ImGui.SameLine();
                 if (ImGui.InputText("##AddNickNameString", ref Service.Configuration.AddNickNameString, 15))
                 {
@@ -165,16 +165,16 @@ namespace UsedName.GUI
                 }
                 ImGui.Unindent();
             }
-            if(ImGui.Checkbox(Service.Loc.Localize("Show CID"), ref Service.Configuration.ShowCidInList))
+            if(ImGui.Checkbox("Show CID".Loc(), ref Service.Configuration.ShowCidInList))
             {
                 Service.Configuration.Save();
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip(Service.Loc.Localize("Show stored CID on the Main Window"));
+                ImGui.SetTooltip("Show stored CID on the Main Window".Loc());
             }
 
-            if (ImGui.Checkbox(Service.Loc.Localize("Modify Store Path"), ref Service.Configuration.modifyStorePath))
+            if (ImGui.Checkbox("Modify Store Path".Loc(), ref Service.Configuration.modifyStorePath))
             {
                 Service.Configuration.Save();
             }
@@ -182,7 +182,7 @@ namespace UsedName.GUI
             {
                 ImGui.Spacing();
                 ImGui.Indent();
-                ImGui.TextUnformatted(Service.Loc.Localize("Store Path:"));
+                ImGui.TextUnformatted("Store Path:".Loc());
                 ImGui.SameLine();
                 var storePath = Service.Configuration.storeNamesPath;
                 if (ImGui.InputText("##StorePath", ref storePath, 260))
@@ -199,7 +199,7 @@ namespace UsedName.GUI
                     }
                 }
                 ImGui.SameLine();
-                if (ImGui.Button(Service.Loc.Localize("Reset Path")))
+                if (ImGui.Button("Reset Path".Loc()))
                 {
                     var path = Path.Join(Service.PluginInterface.ConfigDirectory.FullName, "storeNames.json");
                     if (!Directory.Exists(Path.GetDirectoryName(path)))

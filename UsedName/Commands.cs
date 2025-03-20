@@ -11,13 +11,13 @@ namespace UsedName
         {
             Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = Service.Loc.Localize("Use '/pname' or '/pname update' to update data from FriendList\n") +
-                Service.Loc.Localize("Use '/pname main' to open Main window\n") +
-                Service.Loc.Localize("Use '/pname sub' show plugin's Subscription window\n") +
-                Service.Loc.Localize("Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n") +
-                Service.Loc.Localize("Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n") +
-                Service.Loc.Localize("(Format require:first last nickname; first last nick name)\n") +
-                Service.Loc.Localize("Use '/pname config' show plugin's setting")
+                HelpMessage = "Use '/pname' or '/pname update' to update data from FriendList\n".Loc() +
+                "Use '/pname main' to open Main window\n".Loc() +
+                "Use '/pname sub' show plugin's Subscription window\n".Loc() +
+                "Use '/pname search firstname lastname' to search 'firstname lastname's used name. I **recommend** using the right-click menu to search\n".Loc() +
+                "Use '/pname nick firstname lastname nickname' set 'firstname lastname's nickname to 'nickname'\n".Loc() +
+                "(Format require:first last nickname; first last nick name)\n".Loc() +
+                "Use '/pname config' show plugin's setting".Loc()
             });
         }
 
@@ -31,7 +31,7 @@ namespace UsedName
             if (args == "update")
             {
                 //Service.GameDataManager.UpdateDataFromXivCommon();
-                Service.Chat.Print(Service.Loc.Localize("Command `/pname update` currently not available"));
+                Service.Chat.Print("Command `/pname update` currently not available".Loc());
 
             }
             else if (args.StartsWith("search"))
@@ -48,7 +48,7 @@ namespace UsedName
                 }
                 else
                 {
-                    Service.Chat.PrintError(string.Format(Service.Loc.Localize("Parameter error, length is '{0}'"), temp.Length));
+                    Service.Chat.PrintError(string.Format("Parameter error, length is '{0}'".Loc(), temp.Length));
                     return;
                 }
                 Service.PlayersNamesManager.SearchPlayerResult(targetName);
@@ -75,7 +75,7 @@ namespace UsedName
             }
             else
             {
-                Service.Chat.PrintError(Service.Loc.Localize($"Invalid parameter: ") + args);
+                Service.Chat.PrintError("Invalid parameter: ".Loc() + args);
             }
         }
 

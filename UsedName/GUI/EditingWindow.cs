@@ -29,7 +29,7 @@ public class EditingWindow : Window, IDisposable
 
     public override void Draw()
     {
-        ImGui.Text(Service.PlayersNamesManager.TempPlayerName + Service.Loc.Localize("'s current nick name:"));
+        ImGui.Text(Service.PlayersNamesManager.TempPlayerName + "'s current nick name:".Loc());
 
         ulong targetID = Service.PlayersNamesManager.TempPlayerID;
         if (Service.Configuration.playersNameList.TryGetValue(targetID, out var tar1) && tar1.currentName == Service.PlayersNamesManager.TempPlayerName)
@@ -37,7 +37,7 @@ public class EditingWindow : Window, IDisposable
             if (!TrustOpen)
             {
                 // if not trust open, warning user that this is not 100% accurate
-                ImGui.TextColored(new Vector4(1, 0, 0, 1), Service.Loc.Localize("WARNING: There may be other players with the same name\nPlease verify target before editing"));
+                ImGui.TextColored(new Vector4(1, 0, 0, 1), "WARNING: There may be other players with the same name\nPlease verify target before editing".Loc());
             }
             var nickName = Service.Configuration.playersNameList[targetID].nickName;
             // var nickName = target.nickName;
@@ -49,9 +49,9 @@ public class EditingWindow : Window, IDisposable
         }
         else
         {
-            ImGui.Text(String.Format(Service.Loc.Localize("NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList"), Service.PlayersNamesManager.TempPlayerName));
+            ImGui.Text(String.Format("NO PLAYER FOUND. Please makesure {0} is your friend.\nThen, try update FriendList".Loc(), Service.PlayersNamesManager.TempPlayerName));
             ImGui.Spacing();
-            if (ImGui.Button(Service.Loc.Localize("Update FriendList")))
+            if (ImGui.Button("Update FriendList".Loc()))
             {
                 //Service.GameDataManager.UpdateDataFromXivCommon();
                 Service.Chat.Print("The current function is not available");

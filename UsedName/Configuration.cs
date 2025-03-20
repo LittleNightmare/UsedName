@@ -107,10 +107,9 @@ namespace UsedName
                 {
                     if (File.Exists(defaultPath) && File.Exists(storeNamesPath))
                     {
-                        var hint = Service.Loc.Localize(
-                                       "You modify path of storeNames.json, but there is other storeNames.json at orginal path\n" + 
-                                       "Please, delete one that you don't want to use after game close\n") + 
-                                   $"Your Path(Current Loading): {storeNamesPath}\nOrginal Path:{defaultPath}";
+                        var hint = "You modify path of storeNames.json, but there is other storeNames.json at orginal path\n" + 
+                                 "Please, delete one that you don't want to use after game close\n".Loc() + 
+                                 $"Your Path(Current Loading): {storeNamesPath}\nOrginal Path:{defaultPath}";
                         Service.PluginLog.Warning(hint);
                         Service.Chat.PrintError(hint);
                     }
