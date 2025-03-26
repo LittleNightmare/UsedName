@@ -190,7 +190,7 @@ public unsafe struct CharacterEntry
 }
 public sealed class Character
 {
-    protected internal CharacterEntry Struct;
+    internal CharacterEntry Struct;
     public byte ListType;
     internal Character(CharacterEntry entry, byte listType)
     {
